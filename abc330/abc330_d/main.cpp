@@ -17,13 +17,32 @@ int64_t solve(int N, const std::vector<std::string> &S) {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int N;
-    std::cin >> N;
-    std::vector<std::string> S(N);
-    REP (i, N) {
+    int64_t n;
+    std::cin >> n;
+    std::vector<std::string> S(n);
+    REP (i, n) {
         std::cin >> S[i];
     }
-    auto ans = solve(N, S);
+    vector<int64_t> yoko(n, 0);
+    vector<int64_t> tate(n, 0);
+    REP(i, n){
+        REP(j, n){
+            if(S[i][j] == 'o'){
+                yoko[i]++;
+                tate[j]++;
+            }
+        }
+    }
+    int64_t ans = 0;
+
+    REP(i, n){
+        REP(j, n){
+            if(S[i][j] == 'o'){
+                ans += (yoko[i] - 1) * (tate[j] - 1);
+            }
+        }
+    }
+
     std::cout << ans << '\n';
     return 0;
 }

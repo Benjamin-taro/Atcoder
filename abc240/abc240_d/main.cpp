@@ -52,15 +52,32 @@ auto solve(int N, const std::vector<int64_t> &a) {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int N;
-    std::cin >> N;
-    std::vector<int64_t> a(N);
-    REP (i, N) {
-        std::cin >> a[i];
+    int64_t n;
+    std::cin >> n;
+    stack<pair<int64_t, int64_t>> st;
+    int64_t ans = 0;
+    REP (i, n) {
+        int64_t a;
+        std::cin >> a;
+        if(st.empty() || st.top().first != a) {//スタックが空か、スタックのトップがaと異なる場合
+            st.push({a, 1});
+            ans++;
+        }
+        else {
+            if(st.top().second == a-1) {
+                st.pop();
+                ans -= a-1;
+            }
+            else {
+                pair<int64_t, int64_t> p = st.top();
+                st.pop();
+                p.second++;
+                st.push(p);
+                ans++;
+            }
+        }
+        cout << ans << '\n';
     }
-    auto ans = solve(N, a);
-    REP (i, N) {
-        std::cout << ans[i] << '\n';
-    }
+
     return 0;
 }
