@@ -150,13 +150,28 @@ bool solve(int n, const std::vector<int64_t> &a, const std::vector<int64_t> &b) 
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int n;
+    int64_t n;
     std::cin >> n;
-    std::vector<int64_t> a(n), b(n);
+    std::vector<pair<int64_t, int64_t>> ab(n);
     REP (i, n) {
-        std::cin >> a[i] >> b[i];
+        int64_t a, b;
+        std::cin >> a >> b;
+        ab[i] = {a, b};
     }
-    auto ans = solve(n, a, b);
-    std::cout << (ans ? YES : NO) << '\n';
+
+    std::sort(ab.begin(), ab.end(), [](const std::pair<int64_t, int64_t>& a, const std::pair<int64_t, int64_t>& b) {
+        return a.second < b.second;
+    });
+
+    int64_t time = 0;
+    REP(i, n){
+        time += ab[i].first;
+        if(time > ab[i].second){
+            std::cout << "No" << '\n';
+            return 0;
+        }
+    }
+    std::cout << "Yes" << '\n';
+
     return 0;
 }

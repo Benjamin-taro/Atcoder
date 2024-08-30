@@ -149,13 +149,21 @@ int64_t solve(int N, const std::vector<int64_t> &a) {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int N;
-    std::cin >> N;
-    std::vector<int64_t> a(N);
-    REP (i, N) {
-        std::cin >> a[i];
+    int64_t n;
+    std::cin >> n;
+    map<int64_t, int64_t> a;
+    REP (i, n) {
+        int64_t x;
+        cin >> x;
+        a[x]++;
     }
-    auto ans = solve(N, a);
+    int64_t ans = 0;
+
+    for (auto [x, y] : a) {
+        if(x < y) ans += y - x;
+        else if(x > y) ans += y;
+    }
+
     std::cout << ans << '\n';
     return 0;
 }
