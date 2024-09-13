@@ -21,6 +21,7 @@
 #include <type_traits> // For std::is_floating_point
 #include <cmath> // For std::ceil
 #include <cstring>
+#include <iomanip>  // 追加: 出力精度を指定するため
 #define REP(i, n) for (int i = 0; (i) < (int)(n); ++ (i))
 #define REP3(i, m, n) for (int i = (m); (i) < (int)(n); ++ (i))
 #define REP_R(i, n) for (int i = (int)(n) - 1; (i) >= 0; -- (i))
@@ -140,58 +141,38 @@ bool IsPrime(int num)
 
 
 
+using namespace std;
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
 
     int N;
-    cin >> N;
+    int64_t W;
+    std::cin >> N >> W;
 
-    map<string, string> original;  // 元のペア
-    map<string, string> edited;    // 逆のペア
-    map<string, bool> visited;     // 各文字列が訪問済みかを管理する
+    using Event = pair<int64_t, int64_t>;  // first: 時間, second: 増加 or 減少量
+    vector<Event> events;
 
     for (int i = 0; i < N; ++i) {
-        string s, t;
-        cin >> s >> t;
-        original[s] = t;
-        edited[t] = s;
-        visited[s] = false;
-        visited[t] = false;
+        int64_t S, T, P;
+        std::cin >> S >> T >> P;
+        events.push_back({S, P});  // 開始時に供給量を増加
+        events.push_back({T, -P}); // 終了時に供給量を減少
     }
 
-    bool isValid = true;  // 無限ループが起きないかを判定するフラグ
+    // 時間順にソート
+    sort(events.begin(), events.end());
 
-    // 各ペアについて、連鎖的に無限ループが発生しないか確認する
-    for (auto& [key, value] : original) {
-        if (visited[key]) continue;  // すでに訪れた文字列はスキップ
-
-        string current = key;
-        while (true) {
-            visited[current] = true;  // 現在の文字列を訪問済みにする
-
-            if (original.count(current)) {
-                current = original[current];  // 次の文字列に移動
-            } else {
-                break;  // 次の文字列がない場合は終了
-            }
-
-            if (visited[current]) {
-                // すでに訪問済みの文字列に再び訪れる場合は無限ループが発生
-                isValid = false;
-                break;
-            }
+    int64_t pooled = 0;
+    for (const auto& [time, delta] : events) {
+        pooled += delta;
+        if (pooled > W) {
+            std::cout << "No\n";  // Wを超えた場合
+            return 0;
         }
-
-        if (!isValid) break;
     }
 
-    if (isValid) {
-        cout << "Yes" << endl;
-    } else {
-        cout << "No" << endl;
-    }
-
+    std::cout << "Yes\n";  // 一度もWを超えなかった場合
     return 0;
 }
