@@ -21,6 +21,9 @@
 #include <type_traits> // For std::is_floating_point
 #include <cmath> // For std::ceil
 #include <cstring>
+#include <unordered_set>
+
+#include <iomanip>  // 追加: 出力精度を指定するため
 #define REP(i, n) for (int i = 0; (i) < (int)(n); ++ (i))
 #define REP3(i, m, n) for (int i = (m); (i) < (int)(n); ++ (i))
 #define REP_R(i, n) for (int i = (int)(n) - 1; (i) >= 0; -- (i))
@@ -139,57 +142,93 @@ bool IsPrime(int num)
 }
 
 
+struct Query {
+    int L, R, idx;
+};
 
+int BLOCK_SIZE;
 
+// クエリをブロックごとにソートするための比較関数
+bool compare(Query q1, Query q2) {
+    if (q1.L / BLOCK_SIZE != q2.L / BLOCK_SIZE)
+        return q1.L / BLOCK_SIZE < q2.L / BLOCK_SIZE;
+    return q1.R < q2.R;
+}
+
+void add(int value, unordered_map<int, int>& count, int& distinct_count) {
+    count[value]++;
+    if (count[value] == 1) {
+        distinct_count++;
+    }
+}
+
+void remove(int value, unordered_map<int, int>& count, int& distinct_count) {
+    count[value]--;
+    if (count[value] == 0) {
+        distinct_count--;
+    }
+}
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
     int N;
     cin >> N;
-
-    map<string, int> index; // 文字列をインデックスに変換するマップ
-    int idx = 0;
-    dsu uf(2 * N); // 最大 N ペアなので、2 * N のノード数が必要
-
-    map<string, string> original;
-
-    for (int i = 0; i < N; ++i) {
-        string s, t;
-        cin >> s >> t;
-
-        // 文字列を一意のインデックスに変換
-        if (index.find(s) == index.end()) {
-            index[s] = idx++;
-        }
-        if (index.find(t) == index.end()) {
-            index[t] = idx++;
-        }
-
-        original[s] = t;
+    vector<int> A(N);
+    for (int i = 0; i < N; i++) {
+        cin >> A[i];
     }
 
-    bool isValid = true;
+    BLOCK_SIZE = sqrt(N);
 
-    for (auto& [key, value] : original) {
-        int a = index[key];    // key のインデックス
-        int b = index[value];  // value のインデックス
-
-        if (uf.same(a, b)) {
-            // すでに同じグループに属している場合 -> サイクルが発生
-            isValid = false;
-            break;
+    // クエリは全ての (i, j) を考えるので N * (N + 1) / 2 のクエリがある
+    vector<Query> queries;
+    for (int i = 0; i < N; i++) {
+        for (int j = i; j < N; j++) {
+            queries.push_back({i, j, (int)queries.size()});
         }
-        // 2つのノードを結合
-        uf.merge(a, b);
     }
 
-    if (isValid) {
-        cout << "Yes" << endl;  // 無限ループなし
-    } else {
-        cout << "No" << endl;   // 無限ループあり
+    // クエリをブロックごとにソート
+    sort(queries.begin(), queries.end(), compare);
+
+    vector<long long> results(queries.size());
+    unordered_map<int, int> count;
+    int distinct_count = 0;
+    int currL = 0, currR = -1;
+
+    // 各クエリを処理
+    for (Query q : queries) {
+        int L = q.L;
+        int R = q.R;
+
+        // 現在の範囲を [L, R] に調整
+        while (currR < R) {
+            currR++;
+            add(A[currR], count, distinct_count);
+        }
+        while (currR > R) {
+            remove(A[currR], count, distinct_count);
+            currR--;
+        }
+        while (currL < L) {
+            remove(A[currL], count, distinct_count);
+            currL++;
+        }
+        while (currL > L) {
+            currL--;
+            add(A[currL], count, distinct_count);
+        }
+
+        // 現在の範囲 [L, R] に対する結果を保存
+        results[q.idx] = distinct_count;
     }
+
+    // 最終結果を出力
+    long long final_result = 0;
+    for (long long res : results) {
+        final_result += res;
+    }
+
+    cout << final_result << endl;
 
     return 0;
 }

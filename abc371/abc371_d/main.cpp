@@ -21,6 +21,7 @@
 #include <type_traits> // For std::is_floating_point
 #include <cmath> // For std::ceil
 #include <cstring>
+#include <iomanip>  // 追加: 出力精度を指定するため
 #define REP(i, n) for (int i = 0; (i) < (int)(n); ++ (i))
 #define REP3(i, m, n) for (int i = (m); (i) < (int)(n); ++ (i))
 #define REP_R(i, n) for (int i = (int)(n) - 1; (i) >= 0; -- (i))
@@ -142,53 +143,53 @@ bool IsPrime(int num)
 
 
 
+
+
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
-    int N;
-    cin >> N;
-
-    map<string, int> index; // 文字列をインデックスに変換するマップ
-    int idx = 0;
-    dsu uf(2 * N); // 最大 N ペアなので、2 * N のノード数が必要
-
-    map<string, string> original;
-
-    for (int i = 0; i < N; ++i) {
-        string s, t;
-        cin >> s >> t;
-
-        // 文字列を一意のインデックスに変換
-        if (index.find(s) == index.end()) {
-            index[s] = idx++;
-        }
-        if (index.find(t) == index.end()) {
-            index[t] = idx++;
-        }
-
-        original[s] = t;
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    
+    int64_t N, Q;
+    std::cin >> N;
+    
+    std::vector<std::pair<int64_t, int64_t>> X(N);
+    for (int i = 0; i < N; i++) {
+        std::cin >> X[i].first;
     }
-
-    bool isValid = true;
-
-    for (auto& [key, value] : original) {
-        int a = index[key];    // key のインデックス
-        int b = index[value];  // value のインデックス
-
-        if (uf.same(a, b)) {
-            // すでに同じグループに属している場合 -> サイクルが発生
-            isValid = false;
-            break;
-        }
-        // 2つのノードを結合
-        uf.merge(a, b);
+    for (int i = 0; i < N; i++) {
+        std::cin >> X[i].second;
     }
+    
+    // firstの値に基づいてソート（L以上R以下を効率的に探すため）
+    std::sort(X.begin(), X.end());
 
-    if (isValid) {
-        cout << "Yes" << endl;  // 無限ループなし
-    } else {
-        cout << "No" << endl;   // 無限ループあり
+    
+    // 累積和を計算するための配列を準備
+    std::vector<int64_t> prefix_sum(N + 1, 0);
+    for (int i = 0; i < N; i++) {
+        prefix_sum[i + 1] = prefix_sum[i] + X[i].second;
+    }
+    
+    std::cin >> Q;
+    
+    for (int i = 0; i < Q; i++) {
+        int64_t L, R;
+        std::cin >> L >> R;
+        
+        // L以上の最初の要素を見つけるためのlower_bound
+        int64_t left = std::lower_bound(X.begin(), X.end(), std::make_pair(L, int64_t(-1))) - X.begin();
+        
+        // R以下の要素の範囲を得るためのupper_bound
+        int64_t right = std::upper_bound(X.begin(), X.end(), std::make_pair(R, int64_t(1e18))) - X.begin();
+        
+        // rightがleftより小さい場合（範囲がない場合）は答えは0
+        if (left >= right) {
+            std::cout << 0 << '\n';
+        } else {
+            // L以上R以下の範囲の合計を求める
+            int64_t ans = prefix_sum[right] - prefix_sum[left];
+            std::cout << ans << '\n';
+        }
     }
 
     return 0;

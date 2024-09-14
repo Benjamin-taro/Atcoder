@@ -21,6 +21,7 @@
 #include <type_traits> // For std::is_floating_point
 #include <cmath> // For std::ceil
 #include <cstring>
+#include <iomanip>  // 追加: 出力精度を指定するため
 #define REP(i, n) for (int i = 0; (i) < (int)(n); ++ (i))
 #define REP3(i, m, n) for (int i = (m); (i) < (int)(n); ++ (i))
 #define REP_R(i, n) for (int i = (int)(n) - 1; (i) >= 0; -- (i))
@@ -139,57 +140,105 @@ bool IsPrime(int num)
 }
 
 
+// 2つのノードが接続されているかを確認する関数
+bool are_connected(const map<int, vector<int>>& uf_map, int a, int b) {
+    // aが接続されているノードのリストにbが存在するか確認
+    if (uf_map.find(a) != uf_map.end()) {
+        for (int connected_node : uf_map.at(a)) {
+            if (connected_node == b) return true;
+        }
+    }
+    return false;
+}
 
+// ノード間に辺を追加する関数
+void add_edge(map<int, vector<int>>& uf_map, int a, int b) {
+    uf_map[a].push_back(b);  // aからbへの接続を追加
+    uf_map[b].push_back(a);  // bからaへの接続も追加（無向グラフの場合）
+}
 
+// ノード間の辺を削除する関数
+void erase_edge(map<int, vector<int>>& uf_map, int a, int b) {
+    // aからbを削除
+    if (uf_map.find(a) != uf_map.end()) {
+        auto& neighbors = uf_map[a];
+        neighbors.erase(remove(neighbors.begin(), neighbors.end(), b), neighbors.end());
+    }
+
+    // bからaを削除
+    if (uf_map.find(b) != uf_map.end()) {
+        auto& neighbors = uf_map[b];
+        neighbors.erase(remove(neighbors.begin(), neighbors.end(), a), neighbors.end());
+    }
+}
+
+int solve(int n, int Mg, int Mh, map<int, vector<int>> uf1, map<int, vector<int>> uf2, vector<vector<int>> matrix) {
+    int64_t cost = 0;  // 結果のコスト
+
+    // 全てのノードペアを確認
+    for (int i = 0; i < n; ++i) {
+        for (int j = i + 1; j < n; ++j) {
+            // uf1で連結しているが、uf2で連結していない場合 → uf2に新しい辺を追加
+            if (are_connected(uf1, i, j) && !are_connected(uf2, i, j)) {
+                add_edge(uf2, i, j);
+                cost += matrix[i][j];  // コストを加算
+                std::cerr << "Adding edge between " << i << " and " << j << " with cost " << matrix[i][j] << "\n";
+            }
+            // uf1で連結していないが、uf2で連結している場合 → 辺の削除
+            else if (!are_connected(uf1, i, j) && are_connected(uf2, i, j)) {
+                erase_edge(uf2, i, j);
+                cost += matrix[i][j];  // コストを加算
+                std::cerr << "Removing edge between " << i << " and " << j << " with cost " << matrix[i][j] << "\n";
+            }
+        }
+    }
+
+    return cost;
+}
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
 
-    int N;
-    cin >> N;
+    int n;
+    std::cin >> n;
 
-    map<string, int> index; // 文字列をインデックスに変換するマップ
-    int idx = 0;
-    dsu uf(2 * N); // 最大 N ペアなので、2 * N のノード数が必要
+    int Mg, Mh;
+    std::cin >> Mg;
+    map<int, vector<int>> uf1, uf2;
 
-    map<string, string> original;
-
-    for (int i = 0; i < N; ++i) {
-        string s, t;
-        cin >> s >> t;
-
-        // 文字列を一意のインデックスに変換
-        if (index.find(s) == index.end()) {
-            index[s] = idx++;
-        }
-        if (index.find(t) == index.end()) {
-            index[t] = idx++;
-        }
-
-        original[s] = t;
+    // uf1の辺の入力
+    for (int i = 0; i < Mg; i++) {
+        int a, b;
+        std::cin >> a >> b;
+        a--; b--;  // 1インデックスから0インデックスに変換
+        add_edge(uf1, a, b);
     }
 
-    bool isValid = true;
+    std::cin >> Mh;
 
-    for (auto& [key, value] : original) {
-        int a = index[key];    // key のインデックス
-        int b = index[value];  // value のインデックス
+    // uf2の辺の入力
+    for (int i = 0; i < Mh; i++) {
+        int a, b;
+        std::cin >> a >> b;
+        a--; b--;  // 1インデックスから0インデックスに変換
+        add_edge(uf2, a, b);
+    }
 
-        if (uf.same(a, b)) {
-            // すでに同じグループに属している場合 -> サイクルが発生
-            isValid = false;
-            break;
+    // 2次元ベクトルの初期化 (n x n)
+    std::vector<std::vector<int>> matrix(n, std::vector<int>(n, 0));
+
+    // 上三角部分のみを入力
+    for (int i = 0; i < n - 1; ++i) {
+        for (int j = i + 1; j < n; ++j) {
+            std::cin >> matrix[i][j];
         }
-        // 2つのノードを結合
-        uf.merge(a, b);
     }
 
-    if (isValid) {
-        cout << "Yes" << endl;  // 無限ループなし
-    } else {
-        cout << "No" << endl;   // 無限ループあり
-    }
+    // 結果の計算
+    int result = solve(n, Mg, Mh, uf1, uf2, matrix);
 
+    std::cout << result << '\n';
     return 0;
 }
+
