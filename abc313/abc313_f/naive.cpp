@@ -21,6 +21,7 @@
 #include <type_traits> // For std::is_floating_point
 #include <cmath> // For std::ceil
 #include <cstring>
+#include <iomanip>  // 追加: 出力精度を指定するため
 #define REP(i, n) for (int i = 0; (i) < (int)(n); ++ (i))
 #define REP3(i, m, n) for (int i = (m); (i) < (int)(n); ++ (i))
 #define REP_R(i, n) for (int i = (int)(n) - 1; (i) >= 0; -- (i))
@@ -141,7 +142,7 @@ bool IsPrime(int num)
 
 
 
-int64_t solve(int N, int M, int64_t D, const std::vector<int64_t> &A, const std::vector<int64_t> &B) {
+double solve(int N, int M, const std::vector<int64_t> &A, const std::vector<int64_t> &B, const std::vector<int64_t> &X, const std::vector<int64_t> &Y) {
     // TODO: edit here
 }
 
@@ -150,19 +151,17 @@ int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int N, M;
-    int64_t D;
     std::cin >> N;
-    std::set<int64_t> A(N);
+    std::vector<int64_t> A(N), B(N);
     std::cin >> M;
-    std::v<int64_t> B(M);
-    std::cin >> D;
+    std::vector<int64_t> X(M), Y(M);
     REP (i, N) {
-        std::cin >> A[i];
+        std::cin >> A[i] >> B[i];
     }
     REP (i, M) {
-        std::cin >> B[i];
+        std::cin >> X[i] >> Y[i];
     }
-    auto ans = solve(N, M, D, A, B);
+    auto ans = solve(N, M, A, B, X, Y);
     std::cout << ans << '\n';
     return 0;
 }
