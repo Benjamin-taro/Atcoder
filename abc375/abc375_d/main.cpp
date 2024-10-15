@@ -151,31 +151,38 @@ bool IsPrime(int num)
 }
 
 
-
-#include <bits/stdc++.h>
-using namespace std;
-
-#define rep(i, n) for (ll i = 0; i < (n); i++)
-using ll = long long;
-
 int main() {
-	string s;
-	cin >> s;
-	int n = s.size();
-	vector<vector<int>> sum(26, vector<int>(n + 1));
-	rep(i, n) {
-		rep(j, 26) {
-			sum[j][i + 1] = sum[j][i];
-		}
-		sum[s[i] - 'A'][i + 1]++;
-	}
-	ll ans = 0;
-	for (int i = 1; i < n - 1; i++) {
-		rep(j, 26) {
-			ll l = sum[j][i];
-			ll r = sum[j][n] - sum[j][i + 1];
-			ans += l * r;
-		}
-	}
-	cout << ans << '\n';
+    string s;
+    cin >> s;
+    int n = s.size();
+
+    // 文字 'A' から 'Z' の累積和を記録する2次元ベクトル
+    vector<vector<int>> sum(26, vector<int>(n + 1));
+
+    // 各文字の累積和を計算
+    for (int i = 0; i < n; i++) {
+        // 1つ前の累積和をそのまま次の位置に引き継ぐ
+        sum[s[i] - 'A'][i + 1] = sum[s[i] - 'A'][i] + 1;
+        
+        // その他の文字は累積和を維持する
+        for (int j = 0; j < 26; j++) {
+            if (j != s[i] - 'A') {
+                sum[j][i + 1] = sum[j][i];
+            }
+        }
+    }
+
+    int64_t ans = 0;
+
+    // 文字列の中間点を計算
+    for (int i = 1; i < n - 1; i++) {
+        for (int j = 0; j < 26; j++) {
+            int64_t l = sum[j][i];                        // 文字 j のiまでの累積
+            int64_t r = sum[j][n] - sum[j][i + 1];        // 文字 j のi以降の累積
+            ans += l * r;
+        }
+    }
+
+    cout << ans << '\n';
 }
+
