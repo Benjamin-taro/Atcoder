@@ -1,80 +1,176 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <utility>
+#include <queue>
+#include <array>
+#include <climits>
+#include <cmath>
+#include <set>
+#include <unordered_set>
+#include <map>
+#include <bitset>
+#include <deque>
+#include <numeric>
+#include <assert.h>
+#include <stack>
+#include <unordered_map>
+#include <type_traits> // For std::is_floating_point
+#include <cmath> // For std::ceil
+#include <cstring>
+#include <iomanip>  // 追加: 出力精度を指定するため
+#include <tuple>
+#include <chrono>
+#include <random>
+#include <functional>
+#include <iterator>
+#include <cctype>
+#include <limits>
+#include <cassert>
+#include <complex>
+#include <sstream>
+#define REP(i, n) for (int i = 0; (i) < (int)(n); ++ (i))
+#define REP3(i, m, n) for (int i = (m); (i) < (int)(n); ++ (i))
+#define REP_R(i, n) for (int i = (int)(n) - 1; (i) >= 0; -- (i))
+#define REP3R(i, m, n) for (int i = (int)(n) - 1; (i) >= (int)(m); -- (i))
+#define ALL(x) ::std::begin(x), ::std::end(x)
 using namespace std;
-
-// Fenwick (Binary Indexed) Tree for counting how many T_k >= i
-// We will store +1 at index T_k, and to find how many are >= i
-// we do sumFenwicks(M) - sumFenwicks(i-1).
-
-struct Fenwick {
-    int n;
-    vector<int> fenw;
-    Fenwick(int n) : n(n), fenw(n+1, 0) {}
-    
-    void update(int i, int delta) {
-        for (; i <= n; i += i & -i) {
-            fenw[i] += delta;
+//文字配列の二次元配列みたいなやつを回転させる。
+vector<string> rotate90(const vector<string>& matrix) {
+    int n = matrix.size();
+    int m = matrix[0].size();
+    vector<string> rotated(m, string(n, '.'));
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            rotated[j][n - 1 - i] = matrix[i][j];
         }
     }
-    
-    int query(int i) const {
-        int s = 0;
-        for (; i > 0; i -= i & -i) {
-            s += fenw[i];
-        }
-        return s;
+    return rotated;
+}
+
+// Data structures and algorithms for disjoint set union problems
+struct dsu {
+  public:
+    dsu() : _n(0) {}
+    explicit dsu(int n) : _n(n), parent_or_size(n, -1) {}
+
+    int merge(int a, int b) {
+        assert(0 <= a && a < _n);
+        assert(0 <= b && b < _n);
+        int x = leader(a), y = leader(b);
+        if (x == y) return x;
+        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x, y);
+        parent_or_size[x] += parent_or_size[y];
+        parent_or_size[y] = x;
+        return x;
     }
-    
-    // query in [l..r]
-    int rangeQuery(int l, int r) const {
-        if (l > r) return 0;
-        return query(r) - query(l-1);
+
+    bool same(int a, int b) {
+        assert(0 <= a && a < _n);
+        assert(0 <= b && b < _n);
+        return leader(a) == leader(b);
+    }
+
+    int leader(int a) {
+        assert(0 <= a && a < _n);
+        if (parent_or_size[a] < 0) return a;
+        return parent_or_size[a] = leader(parent_or_size[a]);
+    }
+
+    int size(int a) {
+        assert(0 <= a && a < _n);
+        return -parent_or_size[leader(a)];
+    }
+
+    std::vector<std::vector<int>> groups() {
+        std::vector<int> leader_buf(_n), group_size(_n);
+        for (int i = 0; i < _n; i++) {
+            leader_buf[i] = leader(i);
+            group_size[leader_buf[i]]++;
+        }
+        std::vector<std::vector<int>> result(_n);
+        for (int i = 0; i < _n; i++) {
+            result[i].reserve(group_size[i]);
+        }
+        for (int i = 0; i < _n; i++) {
+            result[leader_buf[i]].push_back(i);
+        }
+        result.erase(
+            std::remove_if(result.begin(), result.end(),
+                           [&](const std::vector<int>& v) { return v.empty(); }),
+            result.end());
+        return result;
+    }
+
+  private:
+    int _n;
+    // root node: -1 * component size
+    // otherwise: parent
+    std::vector<int> parent_or_size;
+};
+
+class PrimeSieve {
+public:
+    PrimeSieve(int max_num) : max_num(max_num), is_prime(max_num + 1, true) {
+        run_sieve();
+    }
+
+    // 素数判定
+    bool isPrime(int num) const {
+        if (num < 0 || num > max_num) return false;
+        return is_prime[num];
+    }
+
+    // 素数のリストを取得
+    std::vector<int> getPrimes() const {
+        std::vector<int> primes;
+        for (int i = 2; i <= max_num; i++) {
+            if (is_prime[i]) primes.push_back(i);
+        }
+        return primes;
+    }
+
+private:
+    int max_num;
+    std::vector<bool> is_prime;
+
+    // エラトステネスの篩を実行
+    void run_sieve() {
+        is_prime[0] = is_prime[1] = false;
+        for (int i = 2; i * i <= max_num; i++) {
+            if (is_prime[i]) {
+                for (int j = i * i; j <= max_num; j += i) {
+                    is_prime[j] = false;
+                }
+            }
+        }
     }
 };
 
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
 
-    int N;
-    cin >> N;
-    vector<long long> A(N+1);
-    for(int i = 1; i <= N; i++){
-        cin >> A[i];
+int main() {
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    REP(i, n) cin >> a[i];
+    vector<int> c(n+1, 0);
+    REP(i, n) {
+        if(i!=0){
+            c[i] += c[i-1];
+            a[i] += c[i];
+        }
+        int cnt = min(n-i-1,a[i]);
+        a[i] -= cnt;
+        c[i+1]++;
+        c[min(n, i+cnt+1)]--;
     }
-    
-    // We need an upper bound for T_i = i + S_i.
-    // S_i can be as large as A[i] + (i-1).
-    // So T_i can be up to i + A[i] + (i-1) ~ 2*i + 500000.
-    // That is at most ~ 2*N + 500000.  We'll pick a Fenwicks array
-    // of that size safely.
-    const int MAXT = 2*N + 500000 + 10;
-    
-    Fenwick fenw(MAXT);
-    vector<long long> S(N+1, 0);
-
-    for(int i = 1; i <= N; i++){
-        // G_i = number of k < i with i <= T_k
-        // That is how many T_k are >= i.
-        // so G_i = fenw.rangeQuery(i, MAXT).
-        long long Gi = fenw.rangeQuery(i, MAXT);
-        
-        // Now S_i = A_i + G_i
-        S[i] = A[i] + Gi;
-        
-        // T_i = i + S[i]. Store +1 in Fenwicks at T_i.
-        long long Ti = i + S[i];
-        // Must cast Ti to int if we use it as index. It's guaranteed
-        // to be <= MAXT in the problem constraints.
-        fenw.update((int)Ti, 1);
-    }
-    
-    // Now compute final stones after N years:
-    // Fi = max(0, S_i - (N - i))
-    // Because from year i+1..N, up to (N-i) gifts might be forced out.
-    for(int i = 1; i <= N; i++){
-        long long giveAway = (long long)(N - i); 
-        long long remain = S[i] - min(S[i], giveAway);
-        cout << remain << (i == N ? '\n' : ' ');
+    REP(i, n){
+        cout << a[i] << " ";
     }
     return 0;
 }
+
