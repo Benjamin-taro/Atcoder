@@ -178,8 +178,11 @@ int main() {
     for(int64_t i = 0; i < n; i++){
         for(int64_t j = i + 1; j < n; j++){
             double prob = 0;
-            for(auto [k, temp] : a[i]){
-                prob += ((double)value/ (double)b[i]) * ((double)a[j][key]/(double)b[j]);
+            for (auto &[key, count_i] : a[i].second) {
+                if(a[j].second.find(key) == a[j].second.end()) continue;
+                double pi = (double)count_i / (double)a[i].first;
+                double pj = (double)a[j].second[key] / (double)a[j].first;
+                prob += pi * pj;
             }
             ans = max(ans, prob);
         }
