@@ -165,20 +165,42 @@ int main() {
         int t;
         std::cin >> t;
         if(t == 1){
-
+            int a, b;
+            std::cin >> a >> b;
+            a--;
+            b--;
+            front[b] = a;
+            back[a] = b;
         }
         if(t == 2){
-
+            int a, b;
+            std::cin >> a >> b;
+            a--;
+            b--;
+            front[b] = -1;
+            back[a] = -1;
         }
         if(t == 3){
-
+            int a;
+            cin >> a;
+            a--;
+            while(a != -1){
+                if(front[a] == -1){
+                    break;
+                }
+                a = front[a];
+            }
+            vector<int64_t> ans;
+            while(a != -1){
+                ans.push_back(a);
+                a = back[a];
+            }
+            cout << ans.size() << " ";
+            for(auto x : ans){
+                cout << x + 1 << " ";
+            }
+            cout << endl;
         }
     }
-    auto ans = solve(n, a);
-    std::cout << (int)ans.size();
-    REP (i, (int)ans.size()) {
-        std::cout << j[i] << ' ';
-    }
-    std::cout << '\n';
     return 0;
 }
