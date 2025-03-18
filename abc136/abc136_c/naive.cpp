@@ -11,6 +11,7 @@
 #include <climits>
 #include <cmath>
 #include <set>
+#include <unordered_set>
 #include <map>
 #include <bitset>
 #include <deque>
@@ -21,6 +22,17 @@
 #include <type_traits> // For std::is_floating_point
 #include <cmath> // For std::ceil
 #include <cstring>
+#include <iomanip>  // 追加: 出力精度を指定するため
+#include <tuple>
+#include <chrono>
+#include <random>
+#include <functional>
+#include <iterator>
+#include <cctype>
+#include <limits>
+#include <cassert>
+#include <complex>
+#include <sstream>
 #define REP(i, n) for (int i = 0; (i) < (int)(n); ++ (i))
 #define REP3(i, m, n) for (int i = (m); (i) < (int)(n); ++ (i))
 #define REP_R(i, n) for (int i = (int)(n) - 1; (i) >= 0; -- (i))
@@ -101,47 +113,47 @@ struct dsu {
     std::vector<int> parent_or_size;
 };
 
-//listing the prime numbers until N
-vector<int64_t> findPrimes(int64_t N) {
-    vector<bool> isPrime(N + 1, true);
-    isPrime[0] = isPrime[1] = false;
-    for (int64_t i = 2; i * i <= N; ++i) {
-        if (isPrime[i]) {
-            for (int64_t j = i * i; j <= N; j += i) {
-                isPrime[j] = false;
+class PrimeSieve {
+public:
+    PrimeSieve(int max_num) : max_num(max_num), is_prime(max_num + 1, true) {
+        run_sieve();
+    }
+
+    // 素数判定
+    bool isPrime(int num) const {
+        if (num < 0 || num > max_num) return false;
+        return is_prime[num];
+    }
+
+    // 素数のリストを取得
+    std::vector<int> getPrimes() const {
+        std::vector<int> primes;
+        for (int i = 2; i <= max_num; i++) {
+            if (is_prime[i]) primes.push_back(i);
+        }
+        return primes;
+    }
+
+private:
+    int max_num;
+    std::vector<bool> is_prime;
+
+    // エラトステネスの篩を実行
+    void run_sieve() {
+        is_prime[0] = is_prime[1] = false;
+        for (int i = 2; i * i <= max_num; i++) {
+            if (is_prime[i]) {
+                for (int j = i * i; j <= max_num; j += i) {
+                    is_prime[j] = false;
+                }
             }
         }
     }
-    vector<int64_t> primes;
-    for (int64_t i = 2; i <= N; ++i) {
-        if (isPrime[i]) primes.push_back(i);
-    }
-    return primes;
-}
+};
 
-//Checking given number is prime or not
-bool IsPrime(int num)
-{
-    if (num < 2) return false;
-    else if (num == 2) return true;
-    else if (num % 2 == 0) return false; // 偶数はあらかじめ除く
-
-    double sqrtNum = sqrt(num);
-    for (int i = 3; i <= sqrtNum; i += 2)
-    {
-        if (num % i == 0)
-        {
-            // 素数ではない
-            return false;
-        }
-    }
-    return true;
-}
-
-
-
-constexpr int64_t MOD = 998244353;
-auto solve(int N, int Q, const std::vector<int64_t> &A, const std::vector<int64_t> &X) {
+const std::string YES = "Yes";
+const std::string NO = "No";
+bool solve(int N, const std::vector<int64_t> &H) {
     // TODO: edit here
 }
 
@@ -149,25 +161,13 @@ auto solve(int N, int Q, const std::vector<int64_t> &A, const std::vector<int64_
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int64_t n, q;
-    cin >> n >> q;
-    vector<int64_t> a(n);
-    vector<int64_t> prefix(n + 1, 0);
-    REP (i, n) {
-        std::cin >> a[i];   
+    int N;
+    std::cin >> N;
+    std::vector<int64_t> H(N);
+    REP (i, N) {
+        std::cin >> H[i];
     }
-    sort(ALL(a)); //2 5 5 6 11
-    REP(i, n){
-        prefix[i + 1] = prefix[i] + a[i]; // 0 2 7 12 18 29
-    }
-    REP (i, q) {
-        int64_t x; cin >> x;
-        int64_t ans = 0;
-        auto it = upper_bound(ALL(a), x);
-        int64_t idx = it - a.begin(); 
-        ans += idx*x-prefix[idx];
-        ans += prefix[n]-prefix[idx]-x*(n-idx);
-        cout << ans << endl;
-    }   
+    auto ans = solve(N, H);
+    std::cout << (ans ? YES : NO) << '\n';
     return 0;
 }

@@ -160,18 +160,26 @@ auto solve(int n, const std::vector<int64_t> &a) {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    // failed to analyze input format
-    // TODO: edit here
-    int n;
+    int64_t n;
     std::cin >> n;
     std::vector<int64_t> a(n);
     REP (i, n) {
         std::cin >> a[i];
     }
-    auto ans = solve(n, a);
-    std::cout << a << '\n';
-    REP (i, a) {
-        std::cout << b[i] << '\n';
+    map<int64_t, vector<int64_t>> positions;
+    REP(i, n){
+        positions[a[i]].push_back(i);
+    }
+    int64_t q;
+    cin >> q;
+    REP(i, q){
+        int64_t l, r, x;
+        cin >> l >> r >> x;
+        l--; r--;
+        int64_t left = 0, right = 0;
+        left = lower_bound(positions[x].begin(), positions[x].end(), l) - positions[x].begin();
+        right = upper_bound(positions[x].begin(), positions[x].end(), r) - positions[x].begin();
+        cout << right - left << endl;
     }
     return 0;
 }
