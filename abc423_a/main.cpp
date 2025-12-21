@@ -22,7 +22,7 @@
 #include <type_traits> // For std::is_floating_point
 #include <cmath> // For std::ceil
 #include <cstring>
-#include <iomanip>  // 追加: 出力精度を指定するため
+#include <iomanip>  
 #include <tuple>
 #include <chrono>
 #include <random>
