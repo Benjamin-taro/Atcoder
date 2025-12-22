@@ -52,7 +52,6 @@ vector<string> rotate90(const vector<string>& matrix) {
     return rotated;
 }
 
-// Data structures and algorithms for disjoint set union problems
 struct dsu {
   public:
     dsu() : _n(0) {}
