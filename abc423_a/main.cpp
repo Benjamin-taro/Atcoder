@@ -19,8 +19,8 @@
 #include <assert.h>
 #include <stack>
 #include <unordered_map>
-#include <type_traits> // For std::is_floating_point
-#include <cmath> // For std::ceil
+#include <type_traits> 
+#include <cmath> 
 #include <cstring>
 #include <iomanip>  
 #include <tuple>
