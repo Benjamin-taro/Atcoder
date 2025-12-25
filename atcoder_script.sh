@@ -19,7 +19,7 @@ commit_repo () {
   fi
 
   git commit -m "$COMMIT_MSG"
-  git push
+  git push origin main
 }
 
 commit_repo "/Users/iseyuki/atcoder.jp" "Automated commit (atcoder)"
