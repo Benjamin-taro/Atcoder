@@ -1,8 +1,19 @@
 #!/bin/bash
 set -e
 
-# PATH を明示（cron対策）
+# cronは環境が薄いので明示
+export HOME=/Users/iseyuki
 export PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+# ssh-agent を起動して、このスクリプト内で使えるようにする
+eval "$(ssh-agent -s)" >/dev/null
+
+# すでに登録済みなら何もしない / 無ければKeychain経由で追加
+ssh-add -l >/dev/null 2>&1 || true
+ssh-add --apple-use-keychain /Users/iseyuki/.ssh/id_ed25519 >/dev/null 2>&1 || true
+
+# 終了時にagentを落とす（ゾンビ化防止）
+trap 'ssh-agent -k >/dev/null 2>&1 || true' EXIT
 
 commit_repo () {
   REPO_PATH="$1"
@@ -12,7 +23,6 @@ commit_repo () {
 
   git add .
 
-  # 差分がなければ commit/push しない
   if git diff --cached --quiet; then
     echo "[$REPO_PATH] No changes"
     return 0
