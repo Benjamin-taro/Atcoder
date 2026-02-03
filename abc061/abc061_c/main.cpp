@@ -113,44 +113,43 @@ struct dsu {
     std::vector<int> parent_or_size;
 };
 
-//listing the prime numbers until N
-vector<int64_t> findPrimes(int64_t N) {
-    vector<bool> isPrime(N + 1, true);
-    isPrime[0] = isPrime[1] = false;
-    for (int64_t i = 2; i * i <= N; ++i) {
-        if (isPrime[i]) {
-            for (int64_t j = i * i; j <= N; j += i) {
-                isPrime[j] = false;
+class PrimeSieve {
+public:
+    PrimeSieve(int max_num) : max_num(max_num), is_prime(max_num + 1, true) {
+        run_sieve();
+    }
+
+    // 素数判定
+    bool isPrime(int num) const {
+        if (num < 0 || num > max_num) return false;
+        return is_prime[num];
+    }
+
+    // 素数のリストを取得
+    std::vector<int> getPrimes() const {
+        std::vector<int> primes;
+        for (int i = 2; i <= max_num; i++) {
+            if (is_prime[i]) primes.push_back(i);
+        }
+        return primes;
+    }
+
+private:
+    int max_num;
+    std::vector<bool> is_prime;
+
+    // エラトステネスの篩を実行
+    void run_sieve() {
+        is_prime[0] = is_prime[1] = false;
+        for (int i = 2; i * i <= max_num; i++) {
+            if (is_prime[i]) {
+                for (int j = i * i; j <= max_num; j += i) {
+                    is_prime[j] = false;
+                }
             }
         }
     }
-    vector<int64_t> primes;
-    for (int64_t i = 2; i <= N; ++i) {
-        if (isPrime[i]) primes.push_back(i);
-    }
-    return primes;
-}
-
-//Checking given number is prime or not
-bool IsPrime(int num)
-{
-    if (num < 2) return false;
-    else if (num == 2) return true;
-    else if (num % 2 == 0) return false; // 偶数はあらかじめ除く
-
-    double sqrtNum = sqrt(num);
-    for (int i = 3; i <= sqrtNum; i += 2)
-    {
-        if (num % i == 0)
-        {
-            // 素数ではない
-            return false;
-        }
-    }
-    return true;
-}
-
-
+};
 
 
 
@@ -158,25 +157,29 @@ bool IsPrime(int num)
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int64_t n;
-    cin >> n;
-    vector<int64_t> a(n);
-    REP(i, n) cin >> a[i];
-    int64_t INF = 1LL << 60;
-    int64_t ans = INF;
-    for(int i = 0; i < (1 << (n-1)); ++i) {
-        int64_t cur = 0;
-        int64_t o = 0;
-        REP(j, n){
-            o |= a[j];
-            if ((i >> j) & 1) {
-                cur ^= o;
-                o = 0;
-            }
-        }
-        cur ^= o;
-        ans = min(ans, cur);
+    int64_t n, k;
+    std::cin >> n >> k;
+    vector<pair<int64_t, int64_t>> ab_original(n);
+    REP(i, n){
+        int64_t a, b;
+        cin >> a >> b;
+        ab_original[i] = {a, b};
     }
-    cout << ans << "\n";
+    sort(ALL(ab_original), [](const auto& x, const auto& y) {
+        return x.first < y.first;
+    });
+    map<int64_t, int64_t> ab;
+    REP(i, n){
+        auto [a, b] = ab_original[i];
+        ab[a] += b;   
+    }
+    int64_t cnt = 0;
+    for(auto [key, v]: ab){
+        cnt += v;
+        if(cnt >= k){
+            cout << key << endl;
+            return 0;
+        }
+    }
     return 0;
 }
