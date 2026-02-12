@@ -156,6 +156,14 @@ private:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    
+    int64_t n, t;
+    cin >> n >> t;
+    int64_t sum_bat = 0;
+    REP(i, n){
+        int64_t a, b;
+        cin >> a >> b;
+        sum_bat += max(a-b*t, (int64_t)0);
+    }
+    cout << sum_bat << "\n";
     return 0;
 }

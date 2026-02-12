@@ -156,6 +156,19 @@ private:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    
+    int64_t n, s, t;
+    cin >> n >> s >> t;
+    int64_t sum_work = 0;
+    REP(i, n){
+        int64_t a;
+        cin >> a;
+        sum_work += a;
+    }
+    if((s+(sum_work/60) < t) ||((s+(sum_work/60) == t) && sum_work%60 == 0)){
+        cout << "Yes" << "\n";
+    }
+    else{
+        cout << "No" << "\n";
+    }
     return 0;
 }
