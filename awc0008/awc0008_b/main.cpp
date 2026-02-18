@@ -208,17 +208,15 @@ int main() {
     std::cin.tie(nullptr);
     int64_t n;
     cin >> n;
-    bitset<100001> dp;
-    dp[0] = 1;
-    int64_t total = 0;
+    int64_t INF = 1LL<<60;
+    int64_t highest = -INF;
+    int64_t ans = 0;
     REP(i, n){
-        int64_t t; cin >> t;
-        total+=t;
-        dp |= dp<<t;
-    }
-    int64_t ans = total;
-    for(int64_t i=0; i < total+1; i++){
-        if(dp[i]) ans = min(ans, max(i, (total-i)));
+        int64_t h; cin >> h;
+        if(h > highest){
+            ans++;
+            highest = h;
+        }
     }
     cout << ans << "\n";
     return 0;

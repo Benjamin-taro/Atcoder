@@ -206,19 +206,20 @@ struct SegTree {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int64_t n;
-    cin >> n;
-    bitset<100001> dp;
-    dp[0] = 1;
-    int64_t total = 0;
+    int64_t n, m;
+    cin >> n >> m;
+    priority_queue<pair<int64_t, int64_t>> pq;
     REP(i, n){
-        int64_t t; cin >> t;
-        total+=t;
-        dp |= dp<<t;
+        int64_t f, d;
+        cin >> f >> d;
+        pq.push({f, -d});
     }
-    int64_t ans = total;
-    for(int64_t i=0; i < total+1; i++){
-        if(dp[i]) ans = min(ans, max(i, (total-i)));
+    int64_t ans = 0;
+    while(m--){
+        auto[ff, dd] = pq.top(); pq.pop();
+        ans += max(ff, (int64_t)0);
+        ff = max(ff+dd, (int64_t)0);
+        pq.push({ff, dd}); 
     }
     cout << ans << "\n";
     return 0;

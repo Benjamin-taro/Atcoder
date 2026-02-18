@@ -206,19 +206,19 @@ struct SegTree {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int64_t n;
-    cin >> n;
-    bitset<100001> dp;
-    dp[0] = 1;
-    int64_t total = 0;
+    int64_t n, k;
+    cin >> n >> k;
+    vector<int64_t> a(n);
+    vector<int64_t> prefix_a(n+1, 0);
     REP(i, n){
-        int64_t t; cin >> t;
-        total+=t;
-        dp |= dp<<t;
-    }
-    int64_t ans = total;
-    for(int64_t i=0; i < total+1; i++){
-        if(dp[i]) ans = min(ans, max(i, (total-i)));
+        cin >> a[i];
+        prefix_a[i+1] = prefix_a[i]+a[i];
+    } 
+    int64_t ans = 0;
+    for(int64_t i = 0; i <= n-k; i++){
+        int64_t sum = 0;
+        sum = prefix_a[i+k]-prefix_a[i];
+        if(sum <= 0) ans++;
     }
     cout << ans << "\n";
     return 0;
