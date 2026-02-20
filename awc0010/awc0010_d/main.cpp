@@ -233,6 +233,22 @@ struct Fenwick {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    
+    int64_t n, k;
+    cin >> n >> k;
+    vector<int64_t> h(n);
+    REP(i,n) cin >> h[i];
+    sort(ALL(h));
+    reverse(ALL(h));
+    int64_t ans = 0;
+    REP(i, n){
+        if(k){
+            ans++;
+            k--;
+        }
+        else{
+            ans+=h[i];
+        }
+    }
+    cout << ans << "\n";
     return 0;
 }

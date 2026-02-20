@@ -233,6 +233,24 @@ struct Fenwick {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    
+    int64_t n, k, q;
+    cin >> n >> k >> q;
+    vector<int64_t> aa(n);
+    dsu uf(n);
+    REP(i,n){
+        int64_t a; cin >> a;
+        aa[i] = a;
+        if(i == 0) continue;
+        if(abs(aa[i]-aa[i-1])<=k){
+            uf.merge(i, i-1);
+        }
+    }
+    REP(i, q){
+        int64_t l, r;
+        cin >> l >> r;
+        l--; r--;
+        if(uf.leader(l) == uf.leader(r)) cout << "Yes" << "\n";
+        else cout << "No" << "\n";
+    }
     return 0;
 }
