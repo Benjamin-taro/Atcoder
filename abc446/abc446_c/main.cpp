@@ -232,50 +232,44 @@ struct Fenwick {
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    int64_t t; cin >> t;
+    while(t--){
+        int64_t n, d;
+        cin >> n >> d;
+        vector<int64_t> a(n);
+        vector<int64_t> b(n);
+        REP(i, n) cin >> a[i];
+        REP(i, n) cin >> b[i];
 
-    long long n, k;
-    cin >> n >> k;
-    int N = (int)n;          // ← 以降は N を使う
-    int K = (int)k;
+        priority_queue<pair<int64_t,int64_t>, vector<pair<int64_t,int64_t>>, greater<pair<int64_t,int64_t>>> pq;
+        REP(i, n){
+            int64_t cur_d=i+1;
+            pq.push({cur_d, a[i]});
 
-    vector<vector<long long>> c(N, vector<long long>(N));
-    for(int i=0;i<N;i++){
-        for(int j=0;j<N;j++){
-            cin >> c[i][j];
-        }
-    }
+            int64_t use = b[i];
+            while(use && !pq.empty()){
+                auto [day, quan] = pq.top(); pq.pop();
+                if(quan > use){
+                    pq.push({day, quan - use});
+                    use = 0;
+                }else{
+                    use -= quan;
+                }
+            }
 
-    auto min_swaps_from_identity = [&](const vector<int>& p) -> int {
-        vector<int> vis(N, 0);
-        int cycles = 0;
-        for (int i = 0; i < N; i++) {
-            if (vis[i]) continue;
-            cycles++;
-            int cur = i;
-            while (!vis[cur]) {
-                vis[cur] = 1;
-                cur = p[cur];          // p[cur] は 0..N-1
+            // d日以上古いのを捨てる（シャドーイングしない）
+            while(!pq.empty() && cur_d - pq.top().first >= d){
+                pq.pop();
             }
         }
-        return N - cycles;
-    };
-
-    vector<int> perm(N);
-    iota(perm.begin(), perm.end(), 0);
-
-    long long ans = -(1LL<<60);
-
-    do {
-        if (min_swaps_from_identity(perm) > K) continue;
-
-        long long temp = 0;
-        for (int idx = 0; idx < N; idx++) {
-            temp += c[ perm[idx] ][ perm[(idx+1)%N] ];
+        int64_t ans =0;
+        while(!pq.empty()){
+            auto [day, quan] = pq.top();
+            pq.pop();
+            ans+=quan; 
         }
-        ans = max(ans, temp);
+        cout << ans << "\n";
 
-    } while (next_permutation(perm.begin(), perm.end()));
-
-    cout << ans << "\n";
+    }
     return 0;
 }

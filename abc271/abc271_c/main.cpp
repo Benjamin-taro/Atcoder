@@ -151,56 +151,72 @@ private:
     }
 };
 
-template<typename T>
+template<class T> struct OpMax {
+    T operator()(T a, T b) const { return std::max(a, b); }
+    static T id() { return std::numeric_limits<T>::lowest(); } // -INF
+};
+
+template<class T> struct OpMin {
+    T operator()(T a, T b) const { return std::min(a, b); }
+    static T id() { return std::numeric_limits<T>::max(); }   // +INF
+};
+
+template<class T> struct OpSum {
+    T operator()(T a, T b) const { return a + b; }
+    static T id() { return T(0); }
+};
+
+template<typename T, class F>
 struct SegTree {
     int n;
-    vector<T> seg;
-    T ID;
+    std::vector<T> seg;
+    F op;   // 演算（型で決まる）
+    T ID;   // 単位元
 
-    // ===== merge operation =====
-    T op(T a, T b){
-        return a + b; // change here
+    SegTree() : n(0), ID(F::id()) {}
+
+    // size指定
+    SegTree(int N) : ID(F::id()) {
+        init(N);
     }
 
-    // ===== size 指定 constructor =====
-    SegTree(int N, T id): ID(id){
+    // vector から build
+    SegTree(const std::vector<T>& v) : ID(F::id()) {
+        build(v);
+    }
+
+    void init(int N){
         n = 1;
         while(n < N) n <<= 1;
         seg.assign(2*n, ID);
     }
 
-    // ===== vector constructor =====
-    SegTree(const vector<T>& v, T id): ID(id){
-        int N = v.size();
-        n = 1;
-        while(n < N) n <<= 1;
-        seg.assign(2*n, ID);
-
-        for(int i=0;i<N;i++)
-            seg[n+i] = v[i];
-
-        for(int i=n-1;i>0;i--)
-            seg[i] = op(seg[i<<1], seg[i<<1|1]);
+    void build(const std::vector<T>& v){
+        int N = (int)v.size();
+        init(N);
+        for(int i=0;i<N;i++) seg[n+i] = v[i];
+        for(int i=n-1;i>0;i--) seg[i] = op(seg[i<<1], seg[i<<1|1]);
     }
 
-    // ===== point update =====
+    // point update: a[i] = x
     void update(int i, T x){
         i += n;
         seg[i] = x;
-        while(i >>= 1)
-            seg[i] = op(seg[i<<1], seg[i<<1|1]);
+        while(i >>= 1) seg[i] = op(seg[i<<1], seg[i<<1|1]);
     }
 
-    // ===== range query [l,r) =====
-    T query(int l,int r){
-        T L=ID, R=ID;
-        for(l+=n,r+=n;l<r;l>>=1,r>>=1){
-            if(l&1) L=op(L,seg[l++]);
-            if(r&1) R=op(seg[--r],R);
+    // range query [l, r)
+    T query(int l, int r) const {
+        T L = ID, R = ID;
+        for(l += n, r += n; l < r; l >>= 1, r >>= 1){
+            if(l & 1) L = op(L, seg[l++]);
+            if(r & 1) R = op(seg[--r], R);
         }
-        return op(L,R);
+        return op(L, R);
     }
 };
+
+
 
 // ====== TEMPLATE: Fenwick (BIT) ======
 template <class T>
@@ -229,53 +245,60 @@ struct Fenwick {
     }
 };
 
+
+using int64 = long long;
+using namespace std;
+using int64 = long long;
+
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    long long n, k;
-    cin >> n >> k;
-    int N = (int)n;          // ← 以降は N を使う
-    int K = (int)k;
+    int n;
+    cin >> n;
+    vector<int64> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
 
-    vector<vector<long long>> c(N, vector<long long>(N));
-    for(int i=0;i<N;i++){
-        for(int j=0;j<N;j++){
-            cin >> c[i][j];
+    sort(a.begin(), a.end());
+
+    // ユニーク巻だけを保持
+    set<int64> st;
+    for (auto x : a) st.insert(x);
+
+    // 重複冊数（何冊 “余り” があるか）
+    int64 dup = (int64)n - (int64)st.size();
+
+    int64 cur = 1;
+    while (true) {
+        // すでに持ってるなら読む
+        if (st.count(cur)) {
+            st.erase(cur);
+            cur++;
+            continue;
         }
+
+        // cur を作るために「2冊」捨てられるか？
+        // 捨てられる総数 = dup + st.size()
+        if (dup + (int64)st.size() < 2) break;
+
+        int need = 2;
+
+        // まず重複から捨てる（最優先）
+        int take = (int)min<int64>(dup, need);
+        dup -= take;
+        need -= take;
+
+        // 足りなければ最大の巻から捨てる
+        while (need > 0) {
+            auto it = prev(st.end()); // 最大
+            st.erase(it);
+            need--;
+        }
+
+        // 2冊捨てたので cur を1冊買える
+        cur++;
     }
 
-    auto min_swaps_from_identity = [&](const vector<int>& p) -> int {
-        vector<int> vis(N, 0);
-        int cycles = 0;
-        for (int i = 0; i < N; i++) {
-            if (vis[i]) continue;
-            cycles++;
-            int cur = i;
-            while (!vis[cur]) {
-                vis[cur] = 1;
-                cur = p[cur];          // p[cur] は 0..N-1
-            }
-        }
-        return N - cycles;
-    };
-
-    vector<int> perm(N);
-    iota(perm.begin(), perm.end(), 0);
-
-    long long ans = -(1LL<<60);
-
-    do {
-        if (min_swaps_from_identity(perm) > K) continue;
-
-        long long temp = 0;
-        for (int idx = 0; idx < N; idx++) {
-            temp += c[ perm[idx] ][ perm[(idx+1)%N] ];
-        }
-        ans = max(ans, temp);
-
-    } while (next_permutation(perm.begin(), perm.end()));
-
-    cout << ans << "\n";
+    cout << (cur - 1) << "\n";
     return 0;
 }

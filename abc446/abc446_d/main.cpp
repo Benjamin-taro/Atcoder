@@ -232,49 +232,25 @@ struct Fenwick {
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-
-    long long n, k;
-    cin >> n >> k;
-    int N = (int)n;          // ← 以降は N を使う
-    int K = (int)k;
-
-    vector<vector<long long>> c(N, vector<long long>(N));
-    for(int i=0;i<N;i++){
-        for(int j=0;j<N;j++){
-            cin >> c[i][j];
+    int64_t n;
+    cin >> n;
+    vector<int64_t> a(n);
+    REP(i, n) cin >> a[i];
+    map<int64_t, int64_t> mp;
+    REP(i, n){
+        int64_t target = a[i];
+        if(mp[target-1]){
+            mp[target] = mp[target-1]+1;
+        }
+        else{
+            if(!mp[target]) mp[target]=1;
         }
     }
-
-    auto min_swaps_from_identity = [&](const vector<int>& p) -> int {
-        vector<int> vis(N, 0);
-        int cycles = 0;
-        for (int i = 0; i < N; i++) {
-            if (vis[i]) continue;
-            cycles++;
-            int cur = i;
-            while (!vis[cur]) {
-                vis[cur] = 1;
-                cur = p[cur];          // p[cur] は 0..N-1
-            }
-        }
-        return N - cycles;
-    };
-
-    vector<int> perm(N);
-    iota(perm.begin(), perm.end(), 0);
-
-    long long ans = -(1LL<<60);
-
-    do {
-        if (min_swaps_from_identity(perm) > K) continue;
-
-        long long temp = 0;
-        for (int idx = 0; idx < N; idx++) {
-            temp += c[ perm[idx] ][ perm[(idx+1)%N] ];
-        }
-        ans = max(ans, temp);
-
-    } while (next_permutation(perm.begin(), perm.end()));
+    int64_t INF = 1LL<<60;
+    int64_t ans = -INF;
+    for(auto [k, v]:mp){
+        ans = max(ans, v);
+    }
 
     cout << ans << "\n";
     return 0;
