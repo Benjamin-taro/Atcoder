@@ -142,48 +142,25 @@ bool IsPrime(int num)
 
 const int MOD = 998244353;
 
-// 桁数を返す関数
-int countDigits(long long x) {
-    if (x == 0) return 1;
-    int digits = 0;
-    while (x > 0) {
-        digits++;
-        x /= 10;
-    }
-    return digits;
-}
-
 int main() {
-    int N;
-    cin >> N;
-    vector<int> A(N);
-    for (int i = 0; i < N; i++) {
-        cin >> A[i];
+    int64_t n;
+    cin >> n;
+    vector<int64_t> a(n);
+    vector<int64_t> pow10(11, 1);
+    for(int i = 1; i <=10; i++) pow10[i] = (pow10[i-1]*10)%MOD;
+    vector<int64_t> prefix_a(n+1, 0);
+    REP(i, n){
+        cin >> a[i];
+        prefix_a[i+1] = (prefix_a[i]+(a[i]%MOD))%MOD;
     }
-
-    vector<long long> powerOf10(11, 1);
-    for (int i = 1; i < 11; i++) {
-        powerOf10[i] = powerOf10[i - 1] * 10 % MOD;
+    int64_t ans = 0;
+    REP(i, n){
+        int64_t digit = to_string(a[i]).size();
+        ans+=(pow10[digit]*(prefix_a[i]%MOD));
+        ans%=MOD;
+        ans+=(((a[i]%MOD)*i)%MOD);
+        ans%=MOD;
     }
-
-    vector<long long> count(11, 0); // 各桁数ごとの出現回数を数える
-    for (int i = 0; i < N; i++) {
-        int digits = countDigits(A[i]);
-        count[digits]++;
-    }
-
-    long long result = 0;
-    for (int i = 0; i < N; i++) {
-        long long Ai = A[i];
-        int digits_i = countDigits(Ai);
-        for (int d = 1; d <= 10; d++) {
-            if (count[d] == 0) continue;
-            long long term1 = Ai * powerOf10[d] % MOD * count[d] % MOD;
-            long long term2 = Ai * count[d] % MOD;
-            result = (result + term1 + term2) % MOD;
-        }
-    }
-
-    cout << result << endl;
+    cout << ans << "\n";
     return 0;
 }
