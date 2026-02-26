@@ -249,6 +249,18 @@ struct Fenwick {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    
+    int64_t n, m;
+    cin >> n >> m;
+    set<pair<int64_t, int64_t>> couple;
+    int64_t ans; ans = 0;
+    REP(i, m){
+        int64_t a, b;
+        cin >> a >> b;
+        if(a>b) swap(a, b);
+        if(couple.count({a, b}) == 0) couple.insert({a, b});
+        else ans++;
+    }
+    cout << ans << "\n";
+
     return 0;
 }

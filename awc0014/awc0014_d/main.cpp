@@ -249,9 +249,6 @@ struct Fenwick {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int64_t a, b, c;
-    cin >> a >> b >>c;
-    if(a >= b) cout << 0 << "\n";
-    else cout << (b-a)*c << "\n"; 
+    
     return 0;
 }

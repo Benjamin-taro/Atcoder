@@ -249,9 +249,14 @@ struct Fenwick {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int64_t a, b, c;
-    cin >> a >> b >>c;
-    if(a >= b) cout << 0 << "\n";
-    else cout << (b-a)*c << "\n"; 
+    int64_t n, r, t;
+    cin >> n >> r >> t;
+    vector<int64_t> p(n);
+    REP(i, n) cin >> p[i];
+    REP(i, n){
+        int64_t output = min(p[i]*r, t)/p[i];
+        cout << output << " ";
+    } 
+    cout << "\n";
     return 0;
 }
