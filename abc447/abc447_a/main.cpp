@@ -249,32 +249,10 @@ struct Fenwick {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    string s;
-    cin >> s;
-    int64_t n = s.size();
-    vector<int64_t> a;
-    vector<int64_t> b;
-    vector<int64_t> c;
-    REP(i, n){
-        if(s[i] == 'A') a.push_back(i);
-        if(s[i] == 'B') b.push_back(i);
-        if(s[i] == 'C') c.push_back(i);
-    }
-    int64_t idxb = 0, idxc = 0;
-    int64_t b_posi = 0, c_posi = 0;
-    int64_t ans= 0;
-    for(auto idxa:a){
-        auto it = upper_bound(b.begin()+b_posi, b.end(), idxa);
-        idxb = *it;
-        if(it == b.end()) continue;
-        auto it2 = upper_bound(c.begin()+c_posi, c.end(), idxb);
-        idxc = *it2;
-        if(it2 == c.end()) continue;
-        ans++;
-        b_posi = it - b.begin() + 1;
-        c_posi = it2 - c.begin() + 1;
-        cerr << "idxa: " << idxa << ", idxb: " << idxb << ", idxc: " << idxc << endl;
-    }
-    cout << ans << endl;
+    int64_t n, m;
+    cin >> n >> m;
+    n = ((n+2-1)/2)*2;
+    cerr << n << endl;
+    cout << (n/2 >= m ? "Yes" : "No") << "\n";
     return 0;
 }

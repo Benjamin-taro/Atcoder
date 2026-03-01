@@ -252,29 +252,24 @@ int main() {
     string s;
     cin >> s;
     int64_t n = s.size();
-    vector<int64_t> a;
-    vector<int64_t> b;
-    vector<int64_t> c;
+    map<int64_t, int64_t> mp;
     REP(i, n){
-        if(s[i] == 'A') a.push_back(i);
-        if(s[i] == 'B') b.push_back(i);
-        if(s[i] == 'C') c.push_back(i);
+        mp[s[i]]++;
     }
-    int64_t idxb = 0, idxc = 0;
-    int64_t b_posi = 0, c_posi = 0;
-    int64_t ans= 0;
-    for(auto idxa:a){
-        auto it = upper_bound(b.begin()+b_posi, b.end(), idxa);
-        idxb = *it;
-        if(it == b.end()) continue;
-        auto it2 = upper_bound(c.begin()+c_posi, c.end(), idxb);
-        idxc = *it2;
-        if(it2 == c.end()) continue;
-        ans++;
-        b_posi = it - b.begin() + 1;
-        c_posi = it2 - c.begin() + 1;
-        cerr << "idxa: " << idxa << ", idxb: " << idxb << ", idxc: " << idxc << endl;
+    int64_t INF = 1LL<<60;
+    int64_t mcnt = -INF;
+    for(auto [k,v]:mp){
+        mcnt = max(mcnt, v);
     }
-    cout << ans << endl;
+    set<char> proh;
+    for(auto [k, v]:mp){
+        if(v==mcnt) proh.insert(k);
+    }
+    string asn = "";
+    REP(i, n){
+        if(proh.count(s[i])) continue;
+        asn +=s[i];
+    }
+    cout << asn << "\n";
     return 0;
 }
