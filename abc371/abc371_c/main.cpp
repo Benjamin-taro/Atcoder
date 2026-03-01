@@ -140,61 +140,6 @@ bool IsPrime(int num)
 }
 
 
-// 2つのノードが接続されているかを確認する関数
-bool are_connected(const map<int, vector<int>>& uf_map, int a, int b) {
-    // aが接続されているノードのリストにbが存在するか確認
-    if (uf_map.find(a) != uf_map.end()) {
-        for (int connected_node : uf_map.at(a)) {
-            if (connected_node == b) return true;
-        }
-    }
-    return false;
-}
-
-// ノード間に辺を追加する関数
-void add_edge(map<int, vector<int>>& uf_map, int a, int b) {
-    uf_map[a].push_back(b);  // aからbへの接続を追加
-    uf_map[b].push_back(a);  // bからaへの接続も追加（無向グラフの場合）
-}
-
-// ノード間の辺を削除する関数
-void erase_edge(map<int, vector<int>>& uf_map, int a, int b) {
-    // aからbを削除
-    if (uf_map.find(a) != uf_map.end()) {
-        auto& neighbors = uf_map[a];
-        neighbors.erase(remove(neighbors.begin(), neighbors.end(), b), neighbors.end());
-    }
-
-    // bからaを削除
-    if (uf_map.find(b) != uf_map.end()) {
-        auto& neighbors = uf_map[b];
-        neighbors.erase(remove(neighbors.begin(), neighbors.end(), a), neighbors.end());
-    }
-}
-
-int solve(int n, int Mg, int Mh, map<int, vector<int>> uf1, map<int, vector<int>> uf2, vector<vector<int>> matrix) {
-    int64_t cost = 0;  // 結果のコスト
-
-    // 全てのノードペアを確認
-    for (int i = 0; i < n; ++i) {
-        for (int j = i + 1; j < n; ++j) {
-            // uf1で連結しているが、uf2で連結していない場合 → uf2に新しい辺を追加
-            if (are_connected(uf1, i, j) && !are_connected(uf2, i, j)) {
-                add_edge(uf2, i, j);
-                cost += matrix[i][j];  // コストを加算
-                std::cerr << "Adding edge between " << i << " and " << j << " with cost " << matrix[i][j] << "\n";
-            }
-            // uf1で連結していないが、uf2で連結している場合 → 辺の削除
-            else if (!are_connected(uf1, i, j) && are_connected(uf2, i, j)) {
-                erase_edge(uf2, i, j);
-                cost += matrix[i][j];  // コストを加算
-                std::cerr << "Removing edge between " << i << " and " << j << " with cost " << matrix[i][j] << "\n";
-            }
-        }
-    }
-
-    return cost;
-}
 
 int main() {
     std::ios::sync_with_stdio(false);
@@ -205,40 +150,51 @@ int main() {
 
     int Mg, Mh;
     std::cin >> Mg;
-    map<int, vector<int>> uf1, uf2;
-
-    // uf1の辺の入力
-    for (int i = 0; i < Mg; i++) {
-        int a, b;
-        std::cin >> a >> b;
-        a--; b--;  // 1インデックスから0インデックスに変換
-        add_edge(uf1, a, b);
+    
+    vector<vector<int64_t>> g(n, vector<int64_t>(n, 0));
+    vector<vector<int64_t>> h(n, vector<int64_t>(n, 0));
+    REP(i, Mg){
+        int64_t u, v;
+        cin >> u >> v;
+        u--; v--;
+        g[u][v]=g[v][u]=1;
     }
-
-    std::cin >> Mh;
-
-    // uf2の辺の入力
-    for (int i = 0; i < Mh; i++) {
-        int a, b;
-        std::cin >> a >> b;
-        a--; b--;  // 1インデックスから0インデックスに変換
-        add_edge(uf2, a, b);
+    cin >> Mh;
+    REP(i, Mh){
+        int64_t a, b;
+        cin >> a >> b;
+        a--; b--;
+        h[a][b]=h[b][a]=1;
     }
+    vector<vector<int64_t>> cost(n, vector<int64_t>(n, 0));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            cost[i][j] = 0;
 
-    // 2次元ベクトルの初期化 (n x n)
-    std::vector<std::vector<int>> matrix(n, std::vector<int>(n, 0));
-
-    // 上三角部分のみを入力
-    for (int i = 0; i < n - 1; ++i) {
-        for (int j = i + 1; j < n; ++j) {
-            std::cin >> matrix[i][j];
+    for (int i = 0; i < n-1; i++) {
+        for (int j = i+1; j < n; j++) {
+            cin >> cost[i][j];
+            cost[j][i] = cost[i][j];
         }
     }
+    int64_t ans = 1LL<<60;
+    vector<int64_t> p;
+    REP(i, n){
+        p.push_back(i);
+    }
+    do{
+        int64_t cur = 0;
+        for(int u = 0; u < n; u++){
+            for(int v=u+1; v < n; v++){
+                bool gg = g[u][v];
+                bool hh = h[p[u]][p[v]];
+                if(gg != hh) cur += cost[p[u]][p[v]];
+            }
+        }
+        ans = min(ans, cur);
+    }while(next_permutation(ALL(p)));
 
-    // 結果の計算
-    int result = solve(n, Mg, Mh, uf1, uf2, matrix);
-
-    std::cout << result << '\n';
+    cout << ans << "\n";
     return 0;
 }
 
