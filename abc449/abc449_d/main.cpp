@@ -245,22 +245,76 @@ struct Fenwick {
     }
 };
 
+
+
+int64_t count_quadrant(int64_t l, int64_t r, int64_t d, int64_t u){
+    l = max(0LL, l);
+    d = max(0LL, d);
+    if(l>r || d>u){
+        return 0;
+    }
+    int64_t ans = 0;
+    int64_t center = max(l, d);
+    int64_t outer = max(r, u);
+    for(int64_t i = center; i<=outer; i++){
+        if(i%2) continue;
+        if(d<=i && i <=u){
+            int64_t left = l;
+            int64_t right = min(i, r);
+            if(left<=right) ans+=right-left+1;
+        }
+        if(l<=i && i <=r){
+            int64_t bottom = d;
+            int64_t top = min(u, i);
+            if(bottom <= top) ans+=top-bottom+1;
+        }
+        if(d<=i && i <=u && l <=i && i <=r){
+            ans--;
+        }
+    }
+    return ans;
+}
+int64_t count_even(int64_t a, int64_t b){
+    if(a > b) return 0;
+
+    auto floor_div2 = [&](int64_t x) -> int64_t {
+        if(x >= 0) return x / 2;
+        return -(( -x + 1 ) / 2);
+    };
+
+    return floor_div2(b) - floor_div2(a - 1);
+}
+
+int64_t duplicated(int64_t l, int64_t r, int64_t d, int64_t u){
+    int64_t cnt = 0;
+
+    if(d <= 0 && 0 <= u){
+        cnt += count_even(l, r);
+    }
+
+    if(l <= 0 && 0 <= r){
+        cnt += count_even(d, u);
+    }
+
+    if(l <= 0 && 0 <= r && d <= 0 && 0 <= u){
+        cnt++;
+    }
+
+    return cnt;
+}
+
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t t; cin >> t;
-    while(t--){
-        int64_t n; cin >> n;
-        vector<double>c(n);
-        vector<double>p(n);
-        REP(i, n) cin >> c[i] >> p[i];
-        vector<double> vec(n+1, 0.0);
-        for(int64_t i = n; i > 0; i--){
-            double q = (100.0-p[i-1])/100.0;
-            vec[i-1] = max(vec[i], c[i-1]+q*vec[i]);
-        }
-        cout << fixed << setprecision(10) << vec[0] << "\n";
- 
-    }
+
+    int64_t l, r, d, u;
+    cin >> l >> r >> d >> u;
+
+    int64_t q1 = count_quadrant(l, r, d, u);
+    int64_t q2 = count_quadrant(-r, -l, d, u);
+    int64_t q3 = count_quadrant(l, r, -u, -d);
+    int64_t q4 = count_quadrant(-r, -l, -u, -d);
+
+    cout << q1 + q2 + q3 + q4 - duplicated(l, r, d, u)<< '\n';
     return 0;
 }
