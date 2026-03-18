@@ -246,6 +246,8 @@ struct Fenwick {
 };
 
 int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
     int64_t t; cin >> t;
     while(t--){
         int64_t n; cin >> n;
