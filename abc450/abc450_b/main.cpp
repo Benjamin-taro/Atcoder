@@ -248,172 +248,32 @@ struct Fenwick {
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t t; cin >> t;
-    while(t--){
-        int64_t r, g, b; cin >> r >> g >> b;
-        if(r==g && g==b){
-            string pattern = "RGB";
-            string ans = "";
-            REP(i, r){
-                ans+=pattern[i%3];
-                ans+=pattern[((i%3)+1)%3];
-                ans+=pattern[((i%3)+2)%3];
-            }
-            cout << ans << "\n";
-            continue;
+    int64_t n; cin >> n;
+    vector<vector<int64_t>> c(n, vector<int64_t>(n, 0));
+    REP(i, n-1){
+        for(int j = i; j < n-1; j++){
+            cin >> c[i][j];
         }
-        if((!r&&!g)||(!g&&!b)||(!b&&!r)){
-            if(r){
-                cout << "R" << "\n";
-                continue;
-            }
-            if(g){
-                cout << "G" << "\n";
-                continue;
-            }
-            if(b){
-                cout << "B" << "\n";
-                continue;
-            }
-        }
-        if(!r || !g || !b){
-            if(!r){
-                int64_t cyc = min(g, b);
-                string ans = "";
-                if(g>b){
-                    REP(i, cyc) ans+="GB";
-                    ans+="G";
-                }
-                else if(b>g){
-                    REP(i, cyc) ans+="BG";
-                    ans+="B";
-                }
-                else{
-                    REP(i, cyc) ans+="BG";
-                }
-                cout << ans << "\n";
-                continue;
-            }
-            if(!g){
-                int64_t cyc = min(r, b);
-                string ans = "";
-                if(r>b){
-                    REP(i, cyc) ans+="RB";
-                    ans+="R";
-                }
-                else if(b>r){
-                    REP(i, cyc) ans+="BR";
-                    ans+="B";
-                }
-                else{
-                    REP(i, cyc) ans+="BR";
-                }
-                cout << ans << "\n";
-                continue;
-            }
-            if(!b){
-                int64_t cyc = min(g, r);
-                string ans = "";
-                if(g>r){
-                    REP(i, cyc) ans+="GR";
-                    ans+="G";
-                }
-                else if(r>g){
-                    REP(i, cyc) ans+="RG";
-                    ans+="R";
-                }
-                else{
-                    REP(i, cyc) ans+="RG";
-                }
-                cout << ans << "\n";
-                continue;
-            }
-        }
-        int64_t INF = 1LL<<60;
-        int64_t possible = -INF;
-        possible = max(possible, min(r, g+b));
-        possible = max(possible, min(g, r+b));
-        possible = max(possible, min(b, g+r));
-        string ans = "";
-        if(g+b == possible){
-            int64_t g_cnt=0;
-            REP(i, possible*2+1){
-                if(i%2==0) ans+="R";
-                else{
-                    if(g_cnt <g){
-                        ans+="G";
-                        g_cnt++;
-                    }
-                    else ans+="B";
-                }
-            }
-        }
-        else if(r+b == possible){
-            int64_t r_cnt=0;
-            REP(i, possible*2+1){
-                if(i%2==0)ans+="G";
-                else{
-                    if(r_cnt <r){
-                        ans+="R";
-                        r_cnt++;
-                    } 
-                    else ans+="B";
-                }
-            }
-        }
-        else if(g+r == possible){
-            int64_t g_cnt=0;
-            REP(i, possible*2+1){
-                if(i%2==0) ans+="B";
-                else{
-                    if(g_cnt <g){
-                        ans+="G";
-                        g_cnt++;
-                    }
-                    else ans+="R";
-                }
-            }
-        }
-        else if(r == possible){
-            int64_t g_cnt=0;
-            REP(i, possible*2+1){
-                if(i%2==1) ans+="R";
-                else{
-                    if(g_cnt <g){
-                        ans+="G";
-                        g_cnt++;
-                    }
-                    else ans+="B";
-                }
-            }
-        }
-        else if(g == possible){
-            int64_t r_cnt=0;
-            REP(i, possible*2+1){
-                if(i%2==1) ans+="G";
-                else{
-                    if(r_cnt <r){
-                        ans+="R";
-                        r_cnt++;
-                    }
-                    else ans+="B";
-                }
-            }
-        }
-        else if(b == possible){
-            int64_t r_cnt=0;
-            REP(i, possible*2+1){
-                if(i%2==1) ans+="B";
-                else{
-                    if(r_cnt <r){
-                        ans+="R";
-                        r_cnt++;
-                    }
-                    else ans+="G";
-                }
-            }
-        }
-        cout << ans << "\n";
-
     }
+    REP(i, n-1){
+        for(int j = i; j < n-1; j++){
+            cerr << c[i][j] << " ";
+        }
+        cerr << "\n";
+    }
+    bool ans = false;
+
+    for (int a = 0; a < n; ++a) {
+        for (int c2 = a+2; c2 < n; ++c2) {    
+            for (int b = a+1; b < c2; ++b) {
+                if (c[a][c2-1] > c[a][b-1] + c[b][c2-1]) {
+                    ans = true;
+                }
+            }
+        }
+    }
+    if(ans) cout << "Yes" << "\n";
+    else cout << "No" << "\n";
+
+    return 0;
 }
