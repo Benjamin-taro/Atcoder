@@ -248,38 +248,18 @@ struct Fenwick {
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t n, m, k, t; cin >> n >> m >> k >> t;
-    vector<int64_t> c(k); 
-    REP(i, k){
-        int64_t cc; cin >> cc;
-        cc--;
-        c[i]=cc;
-    }
-    vector<vector<int64_t>> f(n);
-    REP(i, m){
-        int64_t u, v; cin >> u >> v;
-        u--; v--;
-        f[u].push_back(v);
-        f[v].push_back(u);
-    }
-    vector<int64_t> ru(n, 0);
-    queue<int64_t> q;
-    REP(i, k){
-        q.push(c[i]);
-        ru[c[i]] = t;
-    }
-    while(!q.empty()){
-        int64_t v = q.front(); q.pop();
-        for(auto nv:f[v]){
-            if(ru[nv] == t) continue;
-            ru[nv]++;
-            if(ru[nv] == t){
-                q.push(nv);
-            }
+    int64_t n, k, l, r; cin >> n >> k >> l >> r;
+    vector<int64_t> t(n);
+    REP(i, n){
+        int64_t x; cin >> x;
+        if(l <= x && x <=r) t[i]=0;
+        else{
+            t[i] = min(abs(x-l), abs(x-r));
         }
     }
-    int64_t ans = 0;
-    REP(i, n) if(ru[i] == t) ans++;
+    sort(ALL(t));
+    int64_t ans=0;
+    REP(i, k) ans+=t[i];
     cout << ans << "\n";
     return 0;
 }
