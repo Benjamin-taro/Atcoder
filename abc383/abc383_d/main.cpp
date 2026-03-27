@@ -1,62 +1,177 @@
 #include <iostream>
+#include <string>
 #include <vector>
+#include <algorithm>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <utility>
+#include <queue>
+#include <array>
+#include <climits>
 #include <cmath>
 #include <set>
-
+#include <unordered_set>
+#include <map>
+#include <bitset>
+#include <deque>
+#include <numeric>
+#include <assert.h>
+#include <stack>
+#include <unordered_map>
+#include <type_traits> // For std::is_floating_point
+#include <cmath> // For std::ceil
+#include <cstring>
+#include <iomanip>  // 追加: 出力精度を指定するため
+#include <tuple>
+#include <chrono>
+#include <random>
+#include <functional>
+#include <iterator>
+#include <cctype>
+#include <limits>
+#include <cassert>
+#include <complex>
+#include <sstream>
+#define REP(i, n) for (int i = 0; (i) < (int)(n); ++ (i))
+#define REP3(i, m, n) for (int i = (m); (i) < (int)(n); ++ (i))
+#define REP_R(i, n) for (int i = (int)(n) - 1; (i) >= 0; -- (i))
+#define REP3R(i, m, n) for (int i = (int)(n) - 1; (i) >= (int)(m); -- (i))
+#define ALL(x) ::std::begin(x), ::std::end(x)
 using namespace std;
+//文字配列の二次元配列みたいなやつを回転させる。
+vector<string> rotate90(const vector<string>& matrix) {
+    int n = matrix.size();
+    int m = matrix[0].size();
+    vector<string> rotated(m, string(n, '.'));
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            rotated[j][n - 1 - i] = matrix[i][j];
+        }
+    }
+    return rotated;
+}
 
-// エラトステネスの篩で素数リストを生成
-vector<int64_t> sieve(int64_t limit) {
-    vector<bool> is_prime(limit + 1, true);
-    is_prime[0] = is_prime[1] = false;
-    for (int64_t i = 2; i * i <= limit; ++i) {
-        if (is_prime[i]) {
-            for (int64_t j = i * i; j <= limit; j += i) {
-                is_prime[j] = false;
+// Data structures and algorithms for disjoint set union problems
+struct dsu {
+  public:
+    dsu() : _n(0) {}
+    explicit dsu(int n) : _n(n), parent_or_size(n, -1) {}
+
+    int merge(int a, int b) {
+        assert(0 <= a && a < _n);
+        assert(0 <= b && b < _n);
+        int x = leader(a), y = leader(b);
+        if (x == y) return x;
+        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x, y);
+        parent_or_size[x] += parent_or_size[y];
+        parent_or_size[y] = x;
+        return x;
+    }
+
+    bool same(int a, int b) {
+        assert(0 <= a && a < _n);
+        assert(0 <= b && b < _n);
+        return leader(a) == leader(b);
+    }
+
+    int leader(int a) {
+        assert(0 <= a && a < _n);
+        if (parent_or_size[a] < 0) return a;
+        return parent_or_size[a] = leader(parent_or_size[a]);
+    }
+
+    int size(int a) {
+        assert(0 <= a && a < _n);
+        return -parent_or_size[leader(a)];
+    }
+
+    std::vector<std::vector<int>> groups() {
+        std::vector<int> leader_buf(_n), group_size(_n);
+        for (int i = 0; i < _n; i++) {
+            leader_buf[i] = leader(i);
+            group_size[leader_buf[i]]++;
+        }
+        std::vector<std::vector<int>> result(_n);
+        for (int i = 0; i < _n; i++) {
+            result[i].reserve(group_size[i]);
+        }
+        for (int i = 0; i < _n; i++) {
+            result[leader_buf[i]].push_back(i);
+        }
+        result.erase(
+            std::remove_if(result.begin(), result.end(),
+                           [&](const std::vector<int>& v) { return v.empty(); }),
+            result.end());
+        return result;
+    }
+
+  private:
+    int _n;
+    // root node: -1 * component size
+    // otherwise: parent
+    std::vector<int> parent_or_size;
+};
+
+class PrimeSieve {
+public:
+    PrimeSieve(int max_num) : max_num(max_num), is_prime(max_num + 1, true) {
+        run_sieve();
+    }
+
+    // 素数判定
+    bool isPrime(int num) const {
+        if (num < 0 || num > max_num) return false;
+        return is_prime[num];
+    }
+
+    // 素数のリストを取得
+    std::vector<int> getPrimes() const {
+        std::vector<int> primes;
+        for (int i = 2; i <= max_num; i++) {
+            if (is_prime[i]) primes.push_back(i);
+        }
+        return primes;
+    }
+
+private:
+    int max_num;
+    std::vector<bool> is_prime;
+
+    // エラトステネスの篩を実行
+    void run_sieve() {
+        is_prime[0] = is_prime[1] = false;
+        for (int i = 2; i * i <= max_num; i++) {
+            if (is_prime[i]) {
+                for (int j = i * i; j <= max_num; j += i) {
+                    is_prime[j] = false;
+                }
             }
         }
     }
-    vector<int64_t> primes;
-    for (int64_t i = 2; i <= limit; ++i) {
-        if (is_prime[i]) {
-            primes.push_back(i);
-        }
-    }
-    return primes;
-}
+};
 
-// 条件を満たす平方数を求める
-vector<int64_t> find_special_squares(int64_t N) {
-    int64_t limit = sqrt(N); // sqrt(N)までの素数が必要
-    vector<int64_t> primes = sieve(limit);
-    set<int64_t> results;
 
-    // 2つの素数の積の平方を生成
-    for (size_t i = 0; i < primes.size(); ++i) {
-        for (size_t j = i + 1; j < primes.size(); ++j) { // 異なる素数のみ
-            if (primes[i] > sqrt(N) / primes[j]) break; // オーバーフロー防止
-            int64_t product = primes[i] * primes[j];
-            int64_t square = product * product;
-            if (square > N) break; // Nを超えたら終了
 
-            // デバッグ用にログを出力
-            // cout << "Primes: " << primes[i] << ", " << primes[j]
-            //      << " -> Square: " << square << endl;
-
-            results.insert(square);
-        }
-    }
-
-    // 結果をベクターに変換
-    return vector<int64_t>(results.begin(), results.end());
-}
-
+// generated by oj-template v4.8.1 (https://github.com/online-judge-tools/template-generator)
 int main() {
-    int64_t N;
-    cin >> N;
-
-    vector<int64_t> special_squares = find_special_squares(N);
-
-    cout << special_squares.size() << endl;
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    int64_t n; cin >> n;
+    PrimeSieve sieve(sqrt(n));
+    auto primes = sieve.getPrimes();
+    int64_t ans = 0;
+    for(int64_t p1:primes)for(int64_t p2:primes){
+        if(p2>=p1) break;
+        if(p1*p1*p2*p2>n)break;
+        ans++;
+    }
+    for(int64_t p:primes){
+        int64_t x=1;
+        REP(i, 8) x*=p;
+        if(x>n) break;
+        ans++;
+    }
+    cout << ans << "\n";
     return 0;
 }
