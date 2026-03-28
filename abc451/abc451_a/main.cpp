@@ -248,55 +248,7 @@ struct Fenwick {
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t n; cin >> n;
-    vector<pair<int64_t, pair<int64_t, int64_t>>> edges;
-    vector<vector<int64_t>> a(n+1, vector<int64_t>(n+1, 0));
-    for(int64_t i = 1; i <=n-1; i++){
-        for(int64_t j = i+1; j<=n; j++){
-            int64_t w; cin >> w;
-            edges.push_back({w, {i, j}});
-            a[i][j] = w;
-            a[j][i] = w;
-        }
-    }
-    sort(ALL(edges));
-    dsu uf(n);
-    vector<vector<pair<int64_t, int64_t>>> tree(n+1);
-    int64_t temp = 0;
-    int64_t cnt = 0;
-    while(cnt < n-1){
-        auto [u, v] = edges[temp].second;
-        int64_t ufu = u, ufv =v;
-        ufu--; ufv--;
-        if(!uf.same(ufu, ufv)){
-            tree[u].push_back({v,edges[temp].first});
-            tree[v].push_back({u,edges[temp].first});
-            uf.merge(ufu, ufv);
-            cnt++;            
-        }
-        temp++;
-    }
-    REP(i, n){
-        queue<int64_t> q;
-        vector<int64_t> distance(n+1, -1);
-        q.push(i+1);
-        distance[i+1] = 0;
-        while(!q.empty()){
-            auto top=q.front(); q.pop();
-            for(auto [nxt, w]:tree[top]){
-                if(distance[nxt] != -1) continue;
-                distance[nxt] = distance[top]+w;
-                q.push(nxt);
-            }
-        }
-        for(int j = i+2; j <= n; j++){
-            if(a[i+1][j] != distance[j]){
-                cout << "No" << "\n";
-                return 0;
-            }
-        }
-    }
-    cout << "Yes" << "\n";
-
+    string s; cin >> s;
+    cout << (s.size()%5 == 0? "Yes":"No");
     return 0;
 }
