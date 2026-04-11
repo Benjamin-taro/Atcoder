@@ -245,71 +245,24 @@ struct Fenwick {
     }
 };
 
-vector<int> dirx = {-1, 0, 1, 0};
-vector<int> diry = {0, 1, 0, -1};
-string dirc = "URDL";
-
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t h, w; cin >> h >> w;
-    vector<string> s(h); REP(i, h) cin >> s[i];
-    pair<int64_t, int64_t> start;
-    pair<int64_t, int64_t> goal;
-    REP(i, h) REP(j, w){
-        if(s[i][j] == 'S') start = make_pair(i, j);
-        if(s[i][j] == 'G') goal = make_pair(i, j);
+    int64_t n; cin >> n;
+    string s; cin >> s;
+    bool oo = true;
+    REP(i, n){
+        if(oo){
+            if(s[i] == 'o') continue;
+            if(s[i] != 'o'){
+                oo=false;
+                cout << s[i];
+            } 
+        }
+        else{
+            cout << s[i];
+        }
     }
-    bool ans = false;
-    string ans_route = "";
-    vector<vector<vector<bool>>> visited(h, (vector<vector<bool>> (w, vector<bool> (4, false))));
-    auto dfs = [&](auto self, pair<int64_t, int64_t> cur, string& route){
-        if(!route.empty()){
-            for(int i = 0; i < 4; i++){
-                if(dirc[i] == route.back()){
-                    if(visited[cur.first][cur.second][i]) return;
-                    else visited[cur.first][cur.second][i] = true;
-                }
-            }
-        }
-        if(route.size() > 5*1000000) return;
-        if(!ans_route.empty()) return;
-        if(cur == goal){
-            ans = true;
-            ans_route = route;
-            return;
-        }
-        if(s[cur.first][cur.second] == 'S' || s[cur.first][cur.second] == '.'){
-            for(int i = 0; i < 4; i++){
-                if(cur.first+dirx[i] < 0 || cur.first+dirx[i] >= h || cur.second+diry[i] < 0 || cur.second+diry[i] >= w || s[cur.first+dirx[i]][cur.second+diry[i]] == '#') continue;
-                route += dirc[i];
-                self(self, make_pair(cur.first+dirx[i], cur.second+diry[i]), route);
-                route.pop_back();
-            }            
-        }
-        if(s[cur.first][cur.second] == 'o'){
-            for(int i = 0; i < 4; i++){
-                if(route.back() != dirc[i]) continue;
-                if(cur.first+dirx[i] < 0 || cur.first+dirx[i] >= h || cur.second+diry[i] < 0 || cur.second+diry[i] >= w || s[cur.first+dirx[i]][cur.second+diry[i]] == '#') continue;
-                route += dirc[i];
-                self(self, make_pair(cur.first+dirx[i], cur.second+diry[i]), route);
-                route.pop_back();
-            }            
-        }
-        if(s[cur.first][cur.second] == 'x'){
-            for(int i = 0; i < 4; i++){
-                if(route.back() == dirc[i]) continue;
-                if(cur.first+dirx[i] < 0 || cur.first+dirx[i] >= h || cur.second+diry[i] < 0 || cur.second+diry[i] >= w || s[cur.first+dirx[i]][cur.second+diry[i]] == '#') continue;
-                route += dirc[i];
-                self(self, make_pair(cur.first+dirx[i], cur.second+diry[i]), route);
-                route.pop_back();
-            }            
-        }
-    };
-    string route = "";
-    dfs(dfs, start, route);
-
-    cout << (ans ? "Yes" : "No") << "\n";
-    if(ans) cout << ans_route << "\n";
+    cout << "\n";
     return 0;
 }
