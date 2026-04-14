@@ -251,26 +251,30 @@ struct Fenwick {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    string s, t; cin >> s >> t;
-    int64_t n = s.size(), m = t.size();
-    vector<vector<int64_t>> posi(26);
-    REP(i, n){
-        posi[s[i]-'a'].push_back(i);
-    }
+    int64_t n, m, c; cin >> n >> m >> c;
+    vector<int64_t> a(n); REP(i, n) cin >> a[i];
+    map<int64_t, int64_t> mp;
+    REP(i, n) mp[a[i]]++;
+    vector<pair<int64_t, int64_t>> d;
+    for(auto p:mp) d.emplace_back(p);
+    for(auto p:mp) d.emplace_back(p.first+m, p.second);
+    int64_t dn = mp.size();
+    
+    int64_t px = d[dn-1].first-m;
+    int64_t r = 0, now = 0;
     int64_t ans = 0;
-    REP(l, n){
-        int64_t r = l;
-        for(auto c:t){
-            int64_t index = lower_bound(ALL(posi[c-'a']), r)-posi[c-'a'].begin();
-            if(index == posi[c-'a'].size()){
-                r = n+1;
-                break;
-            }
-            r=posi[c-'a'][index]+1;
+    REP(i, dn){
+        while(now<c){
+            now+=d[r].second;
+            r++;
         }
-        ans+=(r-l-1);
-
+        auto [x, num] = d[i];
+        ans += (x-px)*now;
+        px = x;
+        now-=num;
     }
     cout << ans << "\n";
+
+
     return 0;
 }
