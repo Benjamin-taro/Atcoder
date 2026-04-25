@@ -252,32 +252,24 @@ string dirc = "URDL";
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t n; cin >> n;
-    string s; cin >> s;
-    vector<int64_t> a(n+1, 0);
-    vector<int64_t> b(n+1, 0);
-    vector<int64_t> c(n+1, 0);
+    int64_t n, k; cin >> n >> k;
+    vector<int64_t> a(n); REP(i, n) cin >> a[i];
+    map<int64_t, int64_t> mp;
+    int64_t sum = 0;
     REP(i, n){
-        a[i+1] = a[i]+(s[i] == 'A'? 1:0);
-        b[i+1] = b[i]+(s[i] == 'B'? 1:0);
-        c[i+1] = c[i]+(s[i] == 'C'? 1:0);
+        mp[a[i]]+=a[i];
+        sum+=a[i];
     }
-    REP(i, n+1){
-        cerr << a[i] << " " << b[i] << " " << c[i] << "\n";
+    vector<int64_t> sums;
+    for(auto [u, v]:mp){
+        sums.push_back(v);
     }
-
-    for(int i = 1; i <= n; i++){
-        int64_t aa = a[i], bb = b[i], cc = c[i];
-        set<int64_t> temp;
-        temp.insert(aa);
-        temp.insert(bb);
-        temp.insert(cc);
-        if()
+    sort(ALL(sums)); reverse(ALL(sums));
+    int64_t idx = 0;
+    while(idx<k && idx<(int64_t)sums.size()){
+        sum-=sums[idx];
+        idx++;
     }
-
-
-
-
-
+    cout << sum << "\n";
     return 0;
 }

@@ -252,32 +252,26 @@ string dirc = "URDL";
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t n; cin >> n;
-    string s; cin >> s;
-    vector<int64_t> a(n+1, 0);
-    vector<int64_t> b(n+1, 0);
-    vector<int64_t> c(n+1, 0);
-    REP(i, n){
-        a[i+1] = a[i]+(s[i] == 'A'? 1:0);
-        b[i+1] = b[i]+(s[i] == 'B'? 1:0);
-        c[i+1] = c[i]+(s[i] == 'C'? 1:0);
+    int64_t h, w; cin >> h >> w;
+    vector<string> s(h); REP(i, h) cin >> s[i];
+    int64_t ans = 0;
+    REP(a, h){
+        for(int b = a; b < h; b++){
+            REP(c, w){
+                for(int d = c; d < w; d++){
+                    bool check = true;
+                    for(int i = a; i <= b; i++){
+                        for(int j = c; j <=d; j++){
+                            if(s[a+b-i][c+d-j] != s[i][j]) check = false;
+                        }
+                    }
+                    if(check){
+                        ans++;
+                    }
+                }
+            }
+        }
     }
-    REP(i, n+1){
-        cerr << a[i] << " " << b[i] << " " << c[i] << "\n";
-    }
-
-    for(int i = 1; i <= n; i++){
-        int64_t aa = a[i], bb = b[i], cc = c[i];
-        set<int64_t> temp;
-        temp.insert(aa);
-        temp.insert(bb);
-        temp.insert(cc);
-        if()
-    }
-
-
-
-
-
+    cout << ans << "\n";
     return 0;
 }

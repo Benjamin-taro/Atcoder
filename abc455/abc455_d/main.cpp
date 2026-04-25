@@ -252,32 +252,41 @@ string dirc = "URDL";
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t n; cin >> n;
-    string s; cin >> s;
-    vector<int64_t> a(n+1, 0);
-    vector<int64_t> b(n+1, 0);
-    vector<int64_t> c(n+1, 0);
-    REP(i, n){
-        a[i+1] = a[i]+(s[i] == 'A'? 1:0);
-        b[i+1] = b[i]+(s[i] == 'B'? 1:0);
-        c[i+1] = c[i]+(s[i] == 'C'? 1:0);
+    int64_t n, q; cin >> n >> q;
+    vector<int64_t> posi_d(n+1);
+    vector<int64_t> posi_u(n+1);
+    for(int i = 1; i <=n; i++){
+        posi_d[i] = -i;
+        posi_u[i] = 0;
     }
-    REP(i, n+1){
-        cerr << a[i] << " " << b[i] << " " << c[i] << "\n";
+    REP(i, q){
+        int64_t c, p; cin >> c >> p;
+        if(posi_d[c]>0) posi_u[posi_d[c]] = 0;
+        posi_d[c] = p;
+        posi_u[p] = c;
     }
-
-    for(int i = 1; i <= n; i++){
-        int64_t aa = a[i], bb = b[i], cc = c[i];
-        set<int64_t> temp;
-        temp.insert(aa);
-        temp.insert(bb);
-        temp.insert(cc);
-        if()
+    for(int i = 1; i <=n; i++){
+        cerr << posi_d[i] << " ";
+        cerr << posi_u[i] << " ";
+        cerr << "\n";
     }
-
-
-
-
-
+    vector<bool> used(n+1, false);
+    vector<int64_t> ans(n+1, 0);
+    for(int i = 1; i <=n; i++){
+        if(posi_d[i] > 0) continue;
+        int64_t up=posi_u[i];
+        int64_t cnt = 1;
+        used[i] = true;
+        while(up!=0){
+            up = posi_u[up];
+            cnt++;
+            used[up] = true;
+        }
+        ans[i] = cnt;
+    }
+    for(int i = 1; i <=n; i++){
+        cout << ans[i] << " ";
+    }
+    cout << "\n";
     return 0;
 }
