@@ -249,35 +249,40 @@ vector<int> dirx = {-1, 0, 1, 0};
 vector<int> diry = {0, 1, 0, -1};
 string dirc = "URDL";
 
+int64_t Combination(int64_t n, int64_t r) {
+    if (r > n || r < 0) return 0;
+    if (r > n - r) r = n - r; // C(n, r) == C(n, n-r)
+    int64_t numerator = 1;
+    int64_t denominator = 1;
+    for (int64_t i = 0; i < r; ++i) {
+        numerator *= (n - i);
+        denominator *= (i + 1);
+    }
+    return numerator / denominator;
+}
+
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t n; cin >> n;
     string s; cin >> s;
-    vector<int64_t> a(n+1, 0);
-    vector<int64_t> b(n+1, 0);
-    vector<int64_t> c(n+1, 0);
+    const int64_t MOD = 998244353;
+    int64_t n = s.size();
+    int64_t ans = 0;
+    vector<vector<int64_t>> dp(3,  vector<int64_t> (n+1, 0));
     REP(i, n){
-        a[i+1] = a[i]+(s[i] == 'A'? 1:0);
-        b[i+1] = b[i]+(s[i] == 'B'? 1:0);
-        c[i+1] = c[i]+(s[i] == 'C'? 1:0);
+        int idx = s[i] - 'a';
+        
+        int64_t total = (dp[0][i] + dp[1][i] + dp[2][i]) % MOD;
+        cerr << dp[0][i] << " " << dp[1][i] << " " << dp[2][i] << endl;
+        cerr << "total: " << total << endl;
+        dp[0][i+1] = dp[0][i];
+        dp[1][i+1] = dp[1][i];
+        dp[2][i+1] = dp[2][i];
+        int64_t add = (1 + total - dp[idx][i] + MOD) % MOD;
+        cerr << "add: " << add << endl;
+        dp[idx][i+1] = (1 + total) % MOD;
+        ans = (ans + add) % MOD;
     }
-    REP(i, n+1){
-        cerr << a[i] << " " << b[i] << " " << c[i] << "\n";
-    }
-
-    for(int i = 1; i <= n; i++){
-        int64_t aa = a[i], bb = b[i], cc = c[i];
-        set<int64_t> temp;
-        temp.insert(aa);
-        temp.insert(bb);
-        temp.insert(cc);
-        if()
-    }
-
-
-
-
-
+    cout << ans << "\n";
     return 0;
 }
