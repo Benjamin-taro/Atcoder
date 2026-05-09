@@ -264,40 +264,15 @@ int64_t Combination(int64_t n, int64_t r) {
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t n, m; cin >> n >> m;
-    map<int64_t, vector<pair<int64_t, int64_t>>> ll;
-    map<int64_t, vector<pair<int64_t, int64_t>>> rr;
-    vector<pair<int64_t, int64_t>> lr(m);
-    REP(i, m){
-        int64_t l, r; cin >> l >> r;
-        ll[l].emplace_back(r,i);
-        rr[r].emplace_back(l,i);
-        lr[i] = make_pair(l, r);
+    int64_t n; cin >> n;
+    vector<vector<int64_t>> a(n);
+    REP(i, n){
+        int64_t l; cin >> l;
+        a[i].resize(l);
+        REP(j, l) cin >> a[i][j];
     }
-    sort(ALL(lr), [](const pair<int64_t, int64_t>& a, const pair<int64_t, int64_t>& b) {
-        if(a.first == b.first) return a.second < b.second;
-        return a.first < b.first;
-    });
-    int64_t q; cin >> q;
-    while(q--){
-        int64_t s, t; cin >> s >> t;
-        if(ll[s].empty() || rr[t].empty()){
-            cout << "No" << "\n";
-            continue;
-        }  
-        else{
-            sort(ALL(ll[s]));
-            sort(ALL(rr[t]));
-            //partially overapping
-            if((ll[s].back().first >= rr[t].front().first) && (ll[s].back().second != rr[t].front().second)){
-                cout << "Yes" << "\n";
-                continue;
-            }
-            //one is covered with the other
-            else{
-                
-            }
-        }
-    }
+    int64_t x, y; cin >> x >> y;
+    x--; y--;
+    cout << a[x][y] << "\n";
     return 0;
 }
