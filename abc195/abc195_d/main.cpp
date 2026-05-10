@@ -1,37 +1,309 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <utility>
+#include <queue>
+#include <array>
+#include <climits>
+#include <cmath>
+#include <set>
+#include <unordered_set>
+#include <map>
+#include <bitset>
+#include <deque>
+#include <numeric>
+#include <assert.h>
+#include <stack>
+#include <unordered_map>
+#include <type_traits> // For std::is_floating_point
+#include <cmath> // For std::ceil
+#include <cstring>
+#include <iomanip>  // 追加: 出力精度を指定するため
+#include <tuple>
+#include <chrono>
+#include <random>
+#include <functional>
+#include <iterator>
+#include <cctype>
+#include <limits>
+#include <cassert>
+#include <complex>
+#include <sstream>
 #define REP(i, n) for (int i = 0; (i) < (int)(n); ++ (i))
 #define REP3(i, m, n) for (int i = (m); (i) < (int)(n); ++ (i))
 #define REP_R(i, n) for (int i = (int)(n) - 1; (i) >= 0; -- (i))
 #define REP3R(i, m, n) for (int i = (int)(n) - 1; (i) >= (int)(m); -- (i))
 #define ALL(x) ::std::begin(x), ::std::end(x)
 using namespace std;
-
-
-auto solve(int64_t a, int b, const std::vector<int64_t> &c, const std::vector<int64_t> &d, int64_t e, const std::vector<int64_t> &f, const std::vector<int64_t> &g) {
-    // TODO: edit here
+//文字配列の二次元配列みたいなやつを回転させる。
+vector<string> rotate90(const vector<string>& matrix) {
+    int n = matrix.size();
+    int m = matrix[0].size();
+    vector<string> rotated(m, string(n, '.'));
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            rotated[j][n - 1 - i] = matrix[i][j];
+        }
+    }
+    return rotated;
 }
+
+// Data structures and algorithms for disjoint set union problems
+struct dsu {
+  public:
+    dsu() : _n(0) {}
+    explicit dsu(int n) : _n(n), parent_or_size(n, -1) {}
+
+    int merge(int a, int b) {
+        assert(0 <= a && a < _n);
+        assert(0 <= b && b < _n);
+        int x = leader(a), y = leader(b);
+        if (x == y) return x;
+        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x, y);
+        parent_or_size[x] += parent_or_size[y];
+        parent_or_size[y] = x;
+        return x;
+    }
+
+    bool same(int a, int b) {
+        assert(0 <= a && a < _n);
+        assert(0 <= b && b < _n);
+        return leader(a) == leader(b);
+    }
+
+    int leader(int a) {
+        assert(0 <= a && a < _n);
+        if (parent_or_size[a] < 0) return a;
+        return parent_or_size[a] = leader(parent_or_size[a]);
+    }
+
+    int size(int a) {
+        assert(0 <= a && a < _n);
+        return -parent_or_size[leader(a)];
+    }
+
+    std::vector<std::vector<int>> groups() {
+        std::vector<int> leader_buf(_n), group_size(_n);
+        for (int i = 0; i < _n; i++) {
+            leader_buf[i] = leader(i);
+            group_size[leader_buf[i]]++;
+        }
+        std::vector<std::vector<int>> result(_n);
+        for (int i = 0; i < _n; i++) {
+            result[i].reserve(group_size[i]);
+        }
+        for (int i = 0; i < _n; i++) {
+            result[leader_buf[i]].push_back(i);
+        }
+        result.erase(
+            std::remove_if(result.begin(), result.end(),
+                           [&](const std::vector<int>& v) { return v.empty(); }),
+            result.end());
+        return result;
+    }
+
+  private:
+    int _n;
+    // root node: -1 * component size
+    // otherwise: parent
+    std::vector<int> parent_or_size;
+};
+
+class PrimeSieve {
+public:
+    PrimeSieve(int max_num) : max_num(max_num), is_prime(max_num + 1, true) {
+        run_sieve();
+    }
+
+    // 素数判定
+    bool isPrime(int num) const {
+        if (num < 0 || num > max_num) return false;
+        return is_prime[num];
+    }
+
+    // 素数のリストを取得
+    std::vector<int> getPrimes() const {
+        std::vector<int> primes;
+        for (int i = 2; i <= max_num; i++) {
+            if (is_prime[i]) primes.push_back(i);
+        }
+        return primes;
+    }
+
+private:
+    int max_num;
+    std::vector<bool> is_prime;
+
+    // エラトステネスの篩を実行
+    void run_sieve() {
+        is_prime[0] = is_prime[1] = false;
+        for (int i = 2; i * i <= max_num; i++) {
+            if (is_prime[i]) {
+                for (int j = i * i; j <= max_num; j += i) {
+                    is_prime[j] = false;
+                }
+            }
+        }
+    }
+};
+
+template<class T> struct OpMax {
+    T operator()(T a, T b) const { return std::max(a, b); }
+    static T id() { return std::numeric_limits<T>::lowest(); } // -INF
+};
+
+template<class T> struct OpMin {
+    T operator()(T a, T b) const { return std::min(a, b); }
+    static T id() { return std::numeric_limits<T>::max(); }   // +INF
+};
+
+template<class T> struct OpSum {
+    T operator()(T a, T b) const { return a + b; }
+    static T id() { return T(0); }
+};
+
+template<typename T, class F>
+struct SegTree {
+    int n;
+    std::vector<T> seg;
+    F op;   // 演算（型で決まる）
+    T ID;   // 単位元
+
+    SegTree() : n(0), ID(F::id()) {}
+
+    // size指定
+    SegTree(int N) : ID(F::id()) {
+        init(N);
+    }
+
+    // vector から build
+    SegTree(const std::vector<T>& v) : ID(F::id()) {
+        build(v);
+    }
+
+    void init(int N){
+        n = 1;
+        while(n < N) n <<= 1;
+        seg.assign(2*n, ID);
+    }
+
+    void build(const std::vector<T>& v){
+        int N = (int)v.size();
+        init(N);
+        for(int i=0;i<N;i++) seg[n+i] = v[i];
+        for(int i=n-1;i>0;i--) seg[i] = op(seg[i<<1], seg[i<<1|1]);
+    }
+
+    // point update: a[i] = x
+    void update(int i, T x){
+        i += n;
+        seg[i] = x;
+        while(i >>= 1) seg[i] = op(seg[i<<1], seg[i<<1|1]);
+    }
+
+    // range query [l, r)
+    T query(int l, int r) const {
+        T L = ID, R = ID;
+        for(l += n, r += n; l < r; l >>= 1, r >>= 1){
+            if(l & 1) L = op(L, seg[l++]);
+            if(r & 1) R = op(seg[--r], R);
+        }
+        return op(L, R);
+    }
+};
+
+
+
+// ====== TEMPLATE: Fenwick (BIT) ======
+template <class T>
+struct Fenwick {
+    int n;
+    vector<T> bit; // 1-indexed
+    Fenwick(int n=0){ init(n); }
+    void init(int n_) { n = n_; bit.assign(n+1, 0); }
+
+    // add v at i (1-indexed)
+    void add(int i, T v){
+        for(; i<=n; i += i&-i) bit[i] += v;
+    }
+
+    // sum of [1..i]
+    T sum(int i) const {
+        T s = 0;
+        for(; i>0; i -= i&-i) s += bit[i];
+        return s;
+    }
+
+    // sum of [l..r]
+    T sum(int l, int r) const {
+        if(l > r) return 0;
+        return sum(r) - sum(l-1);
+    }
+};
+
+vector<int> dirx = {-1, 0, 1, 0};
+vector<int> diry = {0, 1, 0, -1};
+string dirc = "URDL";
+
+int64_t Combination(int64_t n, int64_t r) {
+    if (r > n || r < 0) return 0;
+    if (r > n - r) r = n - r; // C(n, r) == C(n, n-r)
+    int64_t numerator = 1;
+    int64_t denominator = 1;
+    for (int64_t i = 0; i < r; ++i) {
+        numerator *= (n - i);
+        denominator *= (i + 1);
+    }
+    return numerator / denominator;
+}
+
+
 
 // generated by oj-template v4.8.1 (https://github.com/online-judge-tools/template-generator)
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int64_t a;
-    int b;
-    int64_t e;
-    std::cin >> a >> b;
-    std::vector<int64_t> c(b), d(b), f(b), g(b);
-    REP (i, b) {
-        std::cin >> c[i] >> d[i];
+    int64_t n, m, q; cin >> n >> m  >> q;
+    vector<pair<int64_t, int64_t>> wv(n);
+    REP(i, n){
+        int64_t w,v; cin >> w >> v;
+        wv[i]= make_pair(w, v);
     }
-    std::cin >> e;
-    REP (i, b) {
-        std::cin >> f[i] >> g[i];
+    sort(ALL(wv) , [](const pair<int64_t, int64_t> &a, const pair<int64_t, int64_t> &b){
+        if(a.first == b.first) return a.second > b.second;
+        return a.first < b.first;
+    });
+    vector<int64_t> x(m);
+    REP(i, m) cin >> x[i];
+while(q--){
+    int64_t l, r; cin >> l >> r;
+    vector<int64_t> xx;
+    REP(i, m){
+        if(l <= (i+1) && (i+1) <= r) continue;
+        xx.push_back(x[i]);
     }
-    auto ans = solve(a, b, c, d, e, f, g);
-    REP (j, a) {
-        std::cout << h[j] << '\n';
+    sort(ALL(xx));  // 箱を容量昇順
+
+    // 荷物を価値降順でソート
+    // wvは重さ昇順なので別途価値降順のリストが必要
+    vector<pair<int64_t,int64_t>> items(wv); // (w, v)
+    sort(ALL(items), [](auto& a, auto& b){ return a.second > b.second; }); // 価値降順
+
+    multiset<int64_t> boxes(ALL(xx));
+    int64_t ans = 0;
+    for(auto& [w, v] : items){
+        // w以上の容量を持つ箱の中で最小のものを探す
+        auto it = boxes.lower_bound(w);
+        if(it != boxes.end()){
+            ans += v;
+            boxes.erase(it);
+        }
     }
+    cout << ans << "\n";
+}
     return 0;
 }
