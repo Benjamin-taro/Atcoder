@@ -261,26 +261,11 @@ int64_t Combination(int64_t n, int64_t r) {
     return numerator / denominator;
 }
 
-
-int64_t comb(int64_t n, int64_t r){
-    if(r > n || r < 0) return 0;
-    if(r > n - r) r = n - r;
-    int64_t res = 1;
-    for(int64_t i=0; i<r; ++i){
-        res = res * (n - i) / (i + 1);
-    }
-    return res;
-}
-
-
-
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t a, b, c; cin >> a >> b >> c;
-    int64_t ans = 0;
-    for(int64_t i = 2; i <= b; i++){
-        
-    }
+    string s; cin >> s;
+    int64_t n; cin >> n;
+    cout << s.substr(n, s.size()-(2*n)) << "\n";
     return 0;
 }

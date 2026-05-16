@@ -261,26 +261,36 @@ int64_t Combination(int64_t n, int64_t r) {
     return numerator / denominator;
 }
 
-
-int64_t comb(int64_t n, int64_t r){
-    if(r > n || r < 0) return 0;
-    if(r > n - r) r = n - r;
-    int64_t res = 1;
-    for(int64_t i=0; i<r; ++i){
-        res = res * (n - i) / (i + 1);
-    }
-    return res;
-}
-
-
-
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t a, b, c; cin >> a >> b >> c;
-    int64_t ans = 0;
-    for(int64_t i = 2; i <= b; i++){
-        
+    int64_t x; cin >> x;
+    int64_t q; cin >> q;
+    priority_queue<int64_t> bottom;
+    priority_queue<int64_t, vector<int64_t>, greater<int64_t>> upper;
+    bottom.push(x);
+    int64_t cur = x;
+    while(q--){
+        int64_t a, b; cin >> a >> b;
+        if(b < a) swap(a, b);
+        if((a <= cur&& cur<=b)){
+            bottom.push(a);
+            upper.push(b);
+        }
+        else if(a < cur && b < cur){
+            bottom.push(a);
+            bottom.push(b);
+            int64_t temp = bottom.top(); bottom.pop();
+            upper.push(temp);
+        }
+        else{
+            upper.push(a);
+            upper.push(b);
+            int64_t temp = upper.top(); upper.pop();
+            bottom.push(temp);
+        }
+        cur = bottom.top();
+        cout << cur << "\n";
     }
     return 0;
 }

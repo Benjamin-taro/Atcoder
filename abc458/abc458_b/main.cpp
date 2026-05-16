@@ -261,26 +261,49 @@ int64_t Combination(int64_t n, int64_t r) {
     return numerator / denominator;
 }
 
-
-int64_t comb(int64_t n, int64_t r){
-    if(r > n || r < 0) return 0;
-    if(r > n - r) r = n - r;
-    int64_t res = 1;
-    for(int64_t i=0; i<r; ++i){
-        res = res * (n - i) / (i + 1);
-    }
-    return res;
-}
-
-
-
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t a, b, c; cin >> a >> b >> c;
-    int64_t ans = 0;
-    for(int64_t i = 2; i <= b; i++){
-        
+    int64_t h, w; cin >> h >> w;
+    if(h==1 || w==1){
+        if(h == 1 && w == 1){
+            cout << 0 << "\n";
+            return 0;
+        }
+        if(h==1){
+            REP(i, w){
+                if(i == 0 || i == w-1) cout << 1 << " ";
+                else cout << 2 << " ";
+            }
+            return 0;
+        }
+        else{
+            REP(i, h){
+                if(i == 0 || i == h-1) cout << 1 << "\n";
+                else cout << 2 << "\n";
+            }
+            return 0;
+        }
+    }
+    REP(i, h){
+        REP(j, w){
+            if(i == 0 && (j==0 || j == w-1)){
+                cout << 2 << " ";
+            }
+            else if(i == h-1 && (j==0 || j == w-1)){
+                cout << 2 << " ";
+            }
+            else if(i == 0 || i == h-1){
+                cout << 3 << " ";
+            }
+            else if(j == 0 || j == w-1){
+                cout << 3 << " ";
+            }
+            else{
+                cout << 4 << " ";
+            }
+        }
+        cout << "\n";
     }
     return 0;
 }
