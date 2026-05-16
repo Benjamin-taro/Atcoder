@@ -251,37 +251,34 @@ struct Fenwick {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int64_t h, w; cin >> h >> w;
-    vector<vector<int64_t>> c(10, vector<int64_t> (10, 0));
-    REP(i, 10) REP(j, 10){
-        cin >> c[i][j];
+    
+    int64_t h, w;
+    cin >> h >> w;
+    
+    const int64_t INF = 1LL << 60;
+    vector<vector<int64_t>> c(10, vector<int64_t>(10, INF));
+    
+    REP(i, 10) REP(j, 10) {
+        int64_t x; cin >> x;
+        if (i == j) c[i][j] = 0;
+        else c[i][j] = x;
     }
-    vector<vector<int64_t>> a(h, vector<int64_t> (w, 0));
-    REP(i, h) REP(j, w){
-        cin >> a[i][j];
+    
+    // Floyd-Warshall で全ペア最短路
+    REP(k, 10) REP(i, 10) REP(j, 10) {
+        if (c[i][k] != INF && c[k][j] != INF)
+            c[i][j] = min(c[i][j], c[i][k] + c[k][j]);
     }
-    int64_t INF = 1LL<<60;
-    vector<int64_t> shortest(10, INF);
-    REP(i, 10){
-        int64_t temp = INF;
-        vector<int64_t> visited(10, false);
-        auto dfs = [&](auto dfs, int64_t prev, int64_t nxt, int64_t cost, vector<int64_t> visited) -> void{
-            if(visited[nxt]) return;
-            if(nxt == 1){
-                temp = min(temp, cost);
-                return;
-            }
-            REP(j, 10){
-                if(j == prev) continue;
-                visited[j]=true;
-                dfs(dfs, nxt, j, cost+c[prev][nxt], visited);
-                visited[j]=false;
-            }
-            return;  
-        };
-        dfs(dfs, -1, i, 0, visited);
-        shortest[i]=temp;
+    // c[i][1] = 数字iを1に変える最小コスト
+    
+    int64_t ans = 0;
+    REP(i, h) REP(j, w) {
+        int64_t a; cin >> a;
+        if (a != -1 && a != 1) {  // 既に1なら不要
+            ans += c[a][1];
+        }
     }
-    REP(i, 10) cerr << shortest[i] << " ";
+    
+    cout << ans << endl;
     return 0;
 }
