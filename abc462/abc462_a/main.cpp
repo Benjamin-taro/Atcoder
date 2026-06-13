@@ -245,42 +245,16 @@ struct Fenwick {
     }
 };
 
-int64_t combination(int64_t n, int64_t r){
-    if(r < 0 || r > n) return 0;
-    if(r == 0 || r == n) return 1;
-    r = min(r, n - r); // Use symmetry property
-    int64_t result = 1;
-    for(int64_t i = 1; i <= r; ++i){
-        result *= (n - i + 1);
-        result /= i;
-    }
-    return result;
-}
-
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t t; cin >> t;
-    while(t--){
-        int64_t a, b, x, y; cin >> a >> b >> x >> y;
-        x = abs(x); y = abs(y);
-        int64_t total = x+y;
-        int64_t temp = total - (total/2);
-        int64_t ans = 0;
-        if(a < b){
-            ans += a*min(x, temp);
-            ans += b*max((int64_t)0, x-temp);
-            ans += a*min(y, total-temp);
-            ans += b*max((int64_t)0, y-(total-temp));
-        }
-        else{
-            ans += b*min(y, temp);
-            ans += a*max((int64_t)0, y-temp);
-            ans += b*min(x, total-temp);
-            ans += a*max((int64_t)0, x-(total-temp));
-        }
-        cout << ans << "\n";
+    string s; cin >> s;
+    REP(i, s.size()){
+        if(('a'-'a' <= s[i]-'a') && ('z'-'a' >= s[i]-'a')) continue;
+        cout << s[i];
     }
+    cout << "\n";
+
     return 0;
 }

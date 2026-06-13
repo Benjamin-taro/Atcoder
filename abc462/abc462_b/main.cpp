@@ -245,42 +245,27 @@ struct Fenwick {
     }
 };
 
-int64_t combination(int64_t n, int64_t r){
-    if(r < 0 || r > n) return 0;
-    if(r == 0 || r == n) return 1;
-    r = min(r, n - r); // Use symmetry property
-    int64_t result = 1;
-    for(int64_t i = 1; i <= r; ++i){
-        result *= (n - i + 1);
-        result /= i;
-    }
-    return result;
-}
-
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t t; cin >> t;
-    while(t--){
-        int64_t a, b, x, y; cin >> a >> b >> x >> y;
-        x = abs(x); y = abs(y);
-        int64_t total = x+y;
-        int64_t temp = total - (total/2);
-        int64_t ans = 0;
-        if(a < b){
-            ans += a*min(x, temp);
-            ans += b*max((int64_t)0, x-temp);
-            ans += a*min(y, total-temp);
-            ans += b*max((int64_t)0, y-(total-temp));
+    int64_t n; cin >> n;
+    vector<vector<int64_t>> b(n);
+    REP(i, n){
+        int64_t k; cin >> k;
+        REP(j, k){
+            int64_t a; cin >> a; a--;
+            b[a].push_back(i);
         }
-        else{
-            ans += b*min(y, temp);
-            ans += a*max((int64_t)0, y-temp);
-            ans += b*min(x, total-temp);
-            ans += a*max((int64_t)0, x-(total-temp));
-        }
-        cout << ans << "\n";
     }
+    REP(i, n){
+        sort(ALL(b[i]));
+        cout << b[i].size() << " ";
+        for(auto bb:b[i]){
+            cout << bb+1 << " ";
+        }
+        cout << "\n";
+    }
+
     return 0;
 }

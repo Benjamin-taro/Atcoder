@@ -261,26 +261,31 @@ int64_t combination(int64_t n, int64_t r){
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t t; cin >> t;
-    while(t--){
-        int64_t a, b, x, y; cin >> a >> b >> x >> y;
-        x = abs(x); y = abs(y);
-        int64_t total = x+y;
-        int64_t temp = total - (total/2);
-        int64_t ans = 0;
-        if(a < b){
-            ans += a*min(x, temp);
-            ans += b*max((int64_t)0, x-temp);
-            ans += a*min(y, total-temp);
-            ans += b*max((int64_t)0, y-(total-temp));
+    int64_t n, d; cin >> n >> d;
+    map<int64_t, int64_t> mp;
+    for(int i = 0; i < n; i++){
+        int64_t s, t;
+        cin >> s >> t;
+        if(t - d >= s){     
+            mp[s]++;
+            mp[t - d + 1]--;  
         }
-        else{
-            ans += b*min(y, temp);
-            ans += a*max((int64_t)0, y-temp);
-            ans += b*min(x, total-temp);
-            ans += a*max((int64_t)0, x-(total-temp));
-        }
-        cout << ans << "\n";
     }
+
+    int64_t ans = 0;
+    int64_t prev_x = 0;
+    int64_t count = 0;
+
+    for(auto [k, v] : mp){
+        if(count >= 2){
+            ans += count * (count - 1) / 2 * (k - prev_x);
+        }
+        prev_x = k;
+        count += v;
+    }
+
+    cout << ans << "\n";
+    return 0;
+
     return 0;
 }
