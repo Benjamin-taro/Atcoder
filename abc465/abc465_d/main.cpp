@@ -257,32 +257,21 @@ int64_t combination(int64_t n, int64_t r){
     return result;
 }
 
-const int64_t MOD = 998244353;
-
-int count_b(int64_t n){
-    int64_t digit = to_string(n).size();
-    int64_t cnt = 0;
-    string mnum = "";
-    REP(i, digit){
-        cnt*=9;
-        mnum+='9';
-        cnt%=MOD;
-    }
-    int64_t up = stoi(mnum);
-    cnt--;
-    cnt = (up>n?cnt-((up%MOD)-(n%MOD)%MOD):cnt);
-    return cnt;
-}
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t n; cin >> n;
-    // a3の倍数
-    int64_t a = ((n%MOD)/3)%MOD;
-    // b3が含まれる
-    int64_t b = (count_b(n))%MOD;
-    // c3種類
-cerr << b;
+    int64_t t; cin >> t;
+    while(t--){
+        int64_t x, y, k; cin >> x >> y >> k;
+        int64_t ans = 0;
+        int64_t xx = x, yy = y;
+        while((xx != yy)){
+            if(xx > yy) xx/=k;
+            else yy/=k;
+            ans++;
+        }
+        cout << ans << "\n";
+    }
     return 0;
 }

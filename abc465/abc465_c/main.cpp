@@ -257,32 +257,41 @@ int64_t combination(int64_t n, int64_t r){
     return result;
 }
 
-const int64_t MOD = 998244353;
-
-int count_b(int64_t n){
-    int64_t digit = to_string(n).size();
-    int64_t cnt = 0;
-    string mnum = "";
-    REP(i, digit){
-        cnt*=9;
-        mnum+='9';
-        cnt%=MOD;
-    }
-    int64_t up = stoi(mnum);
-    cnt--;
-    cnt = (up>n?cnt-((up%MOD)-(n%MOD)%MOD):cnt);
-    return cnt;
-}
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     int64_t n; cin >> n;
-    // a3の倍数
-    int64_t a = ((n%MOD)/3)%MOD;
-    // b3が含まれる
-    int64_t b = (count_b(n))%MOD;
-    // c3種類
-cerr << b;
+    string s; cin >> s;
+    vector<int64_t> ans(n, 0);
+    reverse(ALL(s));
+    int64_t prev = 1; //1 right 0 left
+    int64_t ridx = n-1, lidx=0;
+    REP(i,n){
+        if(s[i] == 'o'){
+            if(prev == 1){
+                ans[lidx] = n-i;
+                prev=0; lidx++;
+            } 
+            else{
+                ans[ridx] = n-i;
+                prev=1; ridx--;
+            }
+        }
+        if(s[i] == 'x'){
+            if(prev == 1){
+                ans[ridx] = n-i;
+                ridx--;
+            } 
+            else{
+                ans[lidx] = n-i;
+                lidx++;
+            }
+        }
+    }
+    REP(i, n){
+        cout << ans[i] << " ";
+    }
+    cout << "\n";
     return 0;
 }
