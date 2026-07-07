@@ -254,19 +254,23 @@ auto solve(int n, const std::vector<int64_t> &a) {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    // failed to analyze input format
-    // TODO: edit here
-    int n;
-    std::cin >> n;
-    std::vector<int64_t> a(n);
-    REP (i, n) {
-        std::cin >> a[i];
+    int64_t t; cin >> t;
+    while(t--){
+        int64_t n; cin >> n;
+        string s; cin >> s;
+        vector<int64_t> x(n); REP(i, n) cin >> x[i];
+        vector<int64_t> y(n-1); REP(i, n-1) cin >> y[i];
+        int64_t INF = 1LL<<60;
+        vector<vector<int64_t>> dp(2, vector<int64_t> (n+1, -INF));
+        dp[0][0] = dp[1][0] = 0;
+        //0 S 1R;
+        REP(i, n){
+            //S
+            dp[0][i+1]=max(dp[0][i], dp[1][i]+(i!=0?y[i-1]:0))-(s[i] != 'S'?x[i]:0);
+            //R
+            dp[1][i+1]=max(dp[0][i], dp[1][i])-(s[i] != 'R'?x[i]:0);
+        }
+        cout << max(dp[0][n], dp[1][n]) << "\n";
     }
-    auto ans = solve(n, a);
-    std::cout << a << '\n';
-    std::cout << b << '\n';
-    std::cout << c << '\n';
-    std::cout << d << '\n';
-    std::cout << e << '\n';
     return 0;
 }
