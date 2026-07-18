@@ -246,26 +246,31 @@ struct Fenwick {
 };
 
 
+
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t n, m; cin >> n >> m;
-    vector<int64_t> a(n); REP(i, n) cin >> a[i];
-    vector<int64_t> aa(n);
-    copy(ALL(a), aa.begin());
-    vector<int64_t> b(n-1); REP(i, n-1) cin >> b[i];
-    int64_t cntf = 0;
-    for(int i = 1; i < n; i++){
-        if(((a[i]+a[i-1])%m) == b[i-1]) continue;
-        a[i]+=(b[i-1]-((a[i]+a[i-1])%m));
-        cntf+=(b[i-1]-((a[i]+a[i-1])%m));
+    int64_t t; cin >> t;
+    while(t--){
+        int64_t px, py, qx, qy; cin >> px >> py >> qx >> qy;
+        int64_t rx, ry, sx, sy; cin >> rx >> ry >> sx >> sy;
+        int64_t ax = px - qx, ay = py - qy;   
+        int64_t bx = rx - sx, by = ry - sy;   
+        if(ay*bx != by*ax){ //not pararell
+            cout << "Yes" << '\n';
+        }
+        else{
+            int64_t dx = (px + qx) - (rx + sx); // mid point x
+            int64_t dy = (py + qy) - (ry + sy); // mid point y
+            if(dx*ax+dy*ay == 0){
+                cout << "Yes" << "\n";
+            }
+            else{
+                cout << "No" <<"\n";
+            }
+
+        }
+        
     }
-    int64_t cntb = 0;
-    for(int i = n-2; i >=0; i--){
-        if(((aa[i]+aa[i+1])%m) == b[i]) continue;
-        aa[i]+=(b[i]-((aa[i]+aa[i+1])%m));
-        cntb+=(b[i]-((aa[i]+aa[i+1])%m));
-    }
-    cout << min(cntf, cntb) << "\n";
     return 0;
 }

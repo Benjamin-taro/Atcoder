@@ -251,21 +251,12 @@ int main() {
     cin.tie(nullptr);
     int64_t n, m; cin >> n >> m;
     vector<int64_t> a(n); REP(i, n) cin >> a[i];
-    vector<int64_t> aa(n);
-    copy(ALL(a), aa.begin());
     vector<int64_t> b(n-1); REP(i, n-1) cin >> b[i];
-    int64_t cntf = 0;
+    int64_t cnt = 0;
     for(int i = 1; i < n; i++){
         if(((a[i]+a[i-1])%m) == b[i-1]) continue;
-        a[i]+=(b[i-1]-((a[i]+a[i-1])%m));
-        cntf+=(b[i-1]-((a[i]+a[i-1])%m));
+        a[i]++; cnt++;
     }
-    int64_t cntb = 0;
-    for(int i = n-2; i >=0; i--){
-        if(((aa[i]+aa[i+1])%m) == b[i]) continue;
-        aa[i]+=(b[i]-((aa[i]+aa[i+1])%m));
-        cntb+=(b[i]-((aa[i]+aa[i+1])%m));
-    }
-    cout << min(cntf, cntb) << "\n";
+    cout << min(cnt, n-cnt) << "\n";
     return 0;
 }

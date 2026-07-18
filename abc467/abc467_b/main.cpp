@@ -249,23 +249,18 @@ struct Fenwick {
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t n, m; cin >> n >> m;
-    vector<int64_t> a(n); REP(i, n) cin >> a[i];
-    vector<int64_t> aa(n);
-    copy(ALL(a), aa.begin());
-    vector<int64_t> b(n-1); REP(i, n-1) cin >> b[i];
-    int64_t cntf = 0;
-    for(int i = 1; i < n; i++){
-        if(((a[i]+a[i-1])%m) == b[i-1]) continue;
-        a[i]+=(b[i-1]-((a[i]+a[i-1])%m));
-        cntf+=(b[i-1]-((a[i]+a[i-1])%m));
+    int64_t n; cin >> n;
+    int64_t x = 10000, y = 10000;
+    REP(i, n){
+        int64_t a, b; cin >> a >> b;
+        string s; cin >> s;
+        if(s == "take"){
+            x-=a; y-=a;
+        }
+        else{
+            x-=b; y-=a;
+        }
     }
-    int64_t cntb = 0;
-    for(int i = n-2; i >=0; i--){
-        if(((aa[i]+aa[i+1])%m) == b[i]) continue;
-        aa[i]+=(b[i]-((aa[i]+aa[i+1])%m));
-        cntb+=(b[i]-((aa[i]+aa[i+1])%m));
-    }
-    cout << min(cntf, cntb) << "\n";
+    cout << y-x << "\n";
     return 0;
 }
