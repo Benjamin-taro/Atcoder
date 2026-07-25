@@ -249,29 +249,17 @@ struct Fenwick {
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    string s; cin >> s;
-    int64_t n = s.size();
-    int64_t ans = 0;
-    REP(i, n){
-        int64_t check = 0;
-        int64_t l = i, r = i;
-        while(l >= 0 && r <= n-1){
-            if(s[l] != s[r]) check++;
-            if(check >= 2) break;  
-            ans++;
-            l--; r++;
-        }
-    }
-    REP(i, n-1){
-        int64_t check = 0;
-        int64_t l = i, r = i+1;
-        while(l >= 0 && r <= n-1){
-            if(s[l] != s[r]) check++;
-            if(check >= 2) break;  
-            ans++;
-            l--; r++;
-        }
-    }
-    cout << ans << "\n";
+    int64_t n; cin >> n;
+    vector<int64_t> p(n); REP(i, n) cin >> p[i];
+    vector<int64_t> q(n); REP(i, n) cin >> q[i];
+    int64_t por=0, qor=0;
+    vector<int64_t> sample(n); REP(i, n) sample[i]=i+1; int64_t cnt = 0;
+    do {
+        cnt++;                      
+        if (sample == p) por = cnt;
+        if (sample == q) qor = cnt;
+    } while (next_permutation(ALL(sample)));
+
+    cout << (qor-por-1 <=0 ? 0 : qor-por-1) << "\n";
     return 0;
 }

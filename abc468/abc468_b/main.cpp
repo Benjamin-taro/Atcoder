@@ -249,28 +249,19 @@ struct Fenwick {
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    int64_t m, d; cin >> m >> d;
     string s; cin >> s;
-    int64_t n = s.size();
-    int64_t ans = 0;
-    REP(i, n){
-        int64_t check = 0;
-        int64_t l = i, r = i;
-        while(l >= 0 && r <= n-1){
-            if(s[l] != s[r]) check++;
-            if(check >= 2) break;  
-            ans++;
-            l--; r++;
+    vector<bool> b(m, false);
+    REP(i, m){
+        if(s[i]=='G'){
+            for(int j = max((int64_t)0, i-d); j <= min(m-1, i+d); j++){
+                b[j] = true;
+            }
         }
     }
-    REP(i, n-1){
-        int64_t check = 0;
-        int64_t l = i, r = i+1;
-        while(l >= 0 && r <= n-1){
-            if(s[l] != s[r]) check++;
-            if(check >= 2) break;  
-            ans++;
-            l--; r++;
-        }
+    int64_t ans = 0;
+    REP(i, m){
+        if(!b[i]) ans++;
     }
     cout << ans << "\n";
     return 0;
