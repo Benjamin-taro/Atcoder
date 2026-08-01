@@ -249,48 +249,25 @@ struct Fenwick {
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int64_t n, m; cin >> n >> m;
-    vector<int64_t> a(m), b(m); 
-    vector<int64_t> cnt(n, 0);
-    vector<map<int64_t, int64_t>> app(n);
-    REP(i, m){
-        cin >> a[i] >> b[i];
-        a[i]--; b[i]--;
-        cnt[a[i]]++; cnt[b[i]]++;
-        int64_t aa, bb; aa=a[i], bb=b[i];
-        if(bb<aa) swap(aa, bb);
-        app[aa][bb]++;
-    }
-    vector<pair<int64_t, int64_t>> sortable;
-    REP(i, n){
-        sortable.push_back({i, cnt[i]});
-    }
-    sort(ALL(sortable), [](const pair<int64_t, int64_t>& p1, const pair<int64_t, int64_t>& p2) {
-        return p1.second < p2.second;
-    });
+    int64_t n; cin >> n;
+    string s; cin >> s;
     int64_t ans = 0;
-    REP(i, n){
-        int64_t target = m-sortable[i].second;
-        //binary search for the first index where sortable[j].second >= target
-        int64_t left = 0, right = n-1;
-        while(left < right){
-            int64_t mid = (left + right) / 2;
-            if(sortable[mid].second >= target){
-                right = mid;
-            } else {
-                left = mid + 1;
-            }
-        }
-        for(int64_t j = right; j < n; j++){
-            int64_t other = sortable[j].first;
-            if(other == sortable[i].first) continue;
-            int64_t aa, bb; aa=sortable[i].first, bb=other;
-            if(bb<aa) swap(aa, bb);
-            if(cnt[aa] + cnt[bb] - app[aa][bb] >= m) {
-                ans++;
-            }
-        }
+    if(n==1){
+        if(s =="x") ans++;
+        cout << ans << "\n";
+        return 0;
     }
-    cout << ans/2 << "\n";
+    REP(i, n){
+        if(s[i]=='o') continue;
+        if(i == 0){
+            if(s[i+1]=='x') ans++;
+        }
+        if(i == n-1){
+            if(s[i-1] == 'x') ans++;
+        }
+        if(s[i-1]=='x' && s[i+1]=='x') ans++;
+    }
+
+    cout << ans << "\n";
     return 0;
 }
