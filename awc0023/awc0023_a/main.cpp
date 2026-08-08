@@ -245,31 +245,25 @@ struct Fenwick {
     }
 };
 
-int64_t mod = 1e9+7;
-int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-    int64_t n; cin >> n;
-    PrimeSieve sieve(n+1);
-    vector<int64_t> op(n+1, 0); 
-    vector<int64_t> primes = sieve.getPrimes();
-    int64_t ans = 1;
-    REP(i, n){
-        int64_t num = i+1;
-        for(auto p:primes){
-            if(p > num) break;
-            int64_t cnt = 0;
-            while(num%p==0){
-                num/=p;
-                cnt++; 
-            }
-            op[p]+=cnt;
-        }        
+int main(){
+    ios::sync_with_stdio(false); cin.tie(nullptr);
+    int n, q; cin >> n >> q;
+    vector<int64_t> a(n+1, 0);
+    vector<int> idxs;
+    int64_t ans = 0;
+    while(q--){
+        int t; cin >> t;
+        if(t == 1){
+            int x; cin >> x;
+            if(a[x] == 0) idxs.push_back(x);
+            ans ^= a[x] ^ (a[x] + 1);
+            a[x]++;
+        } else {
+            for(int v : idxs){ ans ^= a[v] ^ (a[v] - 1); a[v]--; }
+            vector<int> nx;
+            for(int v : idxs) if(a[v] != 0) nx.push_back(v);
+            idxs.swap(nx);
+        }
+        cout << ans << '\n';
     }
-    for(auto x:op){
-        ans*=(x==0?1:x+1);
-        ans %= mod;
-    }
-    cout << ans << "\n";
-    return 0;
 }
