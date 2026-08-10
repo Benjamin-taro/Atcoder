@@ -245,21 +245,21 @@ struct Fenwick {
     }
 };
 
-int main(){
-    ios::sync_with_stdio(false); cin.tie(nullptr);
-    int64_t sx, sy, tx, ty; cin >> sx >> sy >> tx >> ty;
-    string ans = "";
-    REP(i, tx-sx) ans+="R";
-    REP(i, ty-sy) ans+="U";
-    REP(i, tx-sx) ans+="L";
-    REP(i, ty-sy) ans+="D";
-    ans+="D";
-    REP(i, tx-sx+1) ans+="R";
-    REP(i, ty-sy+1) ans+="U";
-    ans+="L";
-    ans+="U";
-    REP(i, tx-sx+1) ans+="L";
-    REP(i, ty-sy+1) ans+="D";
-    ans+="R";
-    cout << ans << "\n";
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    int64_t n; cin >> n;
+    vector<int64_t> c(n, 0);
+    REP(i, n){
+        int64_t x; cin >> x;
+        x--;
+        c[x]++;
+    }
+    int64_t INF = 1LL<<60;
+    int64_t maxx = -INF;
+    REP(i, n){
+        maxx = max(maxx, c[i]);
+    }
+    cout << n-maxx << "\n";
+    return 0;
 }

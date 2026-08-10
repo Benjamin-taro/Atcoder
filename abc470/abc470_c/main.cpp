@@ -247,19 +247,23 @@ struct Fenwick {
 
 int main(){
     ios::sync_with_stdio(false); cin.tie(nullptr);
-    int64_t sx, sy, tx, ty; cin >> sx >> sy >> tx >> ty;
-    string ans = "";
-    REP(i, tx-sx) ans+="R";
-    REP(i, ty-sy) ans+="U";
-    REP(i, tx-sx) ans+="L";
-    REP(i, ty-sy) ans+="D";
-    ans+="D";
-    REP(i, tx-sx+1) ans+="R";
-    REP(i, ty-sy+1) ans+="U";
-    ans+="L";
-    ans+="U";
-    REP(i, tx-sx+1) ans+="L";
-    REP(i, ty-sy+1) ans+="D";
-    ans+="R";
-    cout << ans << "\n";
+    int n, q; cin >> n >> q;
+    vector<int64_t> a(n+1, 0);
+    vector<int> idxs;
+    int64_t ans = 0;
+    while(q--){
+        int t; cin >> t;
+        if(t == 1){
+            int x; cin >> x;
+            if(a[x] == 0) idxs.push_back(x);
+            ans ^= a[x] ^ (a[x] + 1);
+            a[x]++;
+        } else {
+            for(int v : idxs){ ans ^= a[v] ^ (a[v] - 1); a[v]--; }
+            vector<int> nx;
+            for(int v : idxs) if(a[v] != 0) nx.push_back(v);
+            idxs.swap(nx);
+        }
+        cout << ans << '\n';
+    }
 }

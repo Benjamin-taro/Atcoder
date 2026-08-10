@@ -245,21 +245,13 @@ struct Fenwick {
     }
 };
 
-int main(){
-    ios::sync_with_stdio(false); cin.tie(nullptr);
-    int64_t sx, sy, tx, ty; cin >> sx >> sy >> tx >> ty;
-    string ans = "";
-    REP(i, tx-sx) ans+="R";
-    REP(i, ty-sy) ans+="U";
-    REP(i, tx-sx) ans+="L";
-    REP(i, ty-sy) ans+="D";
-    ans+="D";
-    REP(i, tx-sx+1) ans+="R";
-    REP(i, ty-sy+1) ans+="U";
-    ans+="L";
-    ans+="U";
-    REP(i, tx-sx+1) ans+="L";
-    REP(i, ty-sy+1) ans+="D";
-    ans+="R";
-    cout << ans << "\n";
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    int64_t n; cin >> n;
+    REP(i, n){
+        if(i%3==2) cout << "Fizz" << "\n";
+        else cout << i+1 <<"\n";
+    }
+    return 0;
 }
