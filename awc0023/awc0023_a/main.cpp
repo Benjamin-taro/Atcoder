@@ -250,16 +250,31 @@ int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     int64_t n; cin >> n;
-    string s; cin >> s;
-
-    int64_t bal = 0, mn = 0;
-    REP(i, n) {
-        bal += (s[i] == '(') ? 1 : -1;
-        mn = min(mn, bal);
+    vector<map<int64_t, int64_t>> people(n);
+    REP(i, n){
+        int64_t a; cin >> a;
+        REP(j, a){
+            int64_t x, y; cin >> x >> y;
+            x--;
+            people[i][x]=y;
+        }
     }
-    int64_t a = -mn;    
-    int64_t b = a + bal;     
-    string ans = string(a, '(') + s + string(b, ')');
-    cout << ans << "\n";
-    return 0;
+    int64_t ans = 0;
+    for(int i = 0; i < 1<<n; i++){
+        int64_t cnt = 0;
+        REP(j, n){
+            if(i>>j&1) cnt++;
+        }
+        bool valid = true;
+        REP(k, n){
+            for(auto [x, y]:people[k]){
+            if((i>>k&1) && ((i>>x&1) != y)){
+                    valid = false;
+                    break;
+                }
+            }
+        }
+        if(valid) ans = max(ans, cnt);
+    }
+    cout << ans << endl;
 }
