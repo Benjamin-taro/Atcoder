@@ -33,6 +33,7 @@
 #include <cassert>
 #include <complex>
 #include <sstream>
+#include <cctype>
 #define REP(i, n) for (int i = 0; (i) < (int)(n); ++ (i))
 #define REP3(i, m, n) for (int i = (m); (i) < (int)(n); ++ (i))
 #define REP_R(i, n) for (int i = (int)(n) - 1; (i) >= 0; -- (i))
@@ -249,32 +250,6 @@ struct Fenwick {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int64_t n; cin >> n;
-    vector<map<int64_t, int64_t>> people(n);
-    REP(i, n){
-        int64_t a; cin >> a;
-        REP(j, a){
-            int64_t x, y; cin >> x >> y;
-            x--;
-            people[i][x]=y;
-        }
-    }
-    int64_t ans = 0;
-    for(int i = 0; i < 1<<n; i++){
-        int64_t cnt = 0;
-        REP(j, n){
-            if(i>>j&1) cnt++;
-        }
-        bool valid = true;
-        REP(k, n){
-            for(auto [x, y]:people[k]){
-            if((i>>k&1) && ((i>>x&1) != y)){
-                    valid = false;
-                    break;
-                }
-            }
-        }
-        if(valid) ans = max(ans, cnt);
-    }
-    cout << ans << endl;
+    int64_t
+    return 0;
 }
