@@ -250,40 +250,14 @@ struct Fenwick {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int64_t n, q; cin >> n >> q;
-    map<int64_t, vector<pair<int64_t, int64_t>>> lr;
-    REP(i, q){
-        int64_t l, r, x; cin >> l >> r >> x;
-        l--; r--;
-        lr[x].push_back({l, r});
+    int64_t n, m;
+    cin >> n >> m;
+    vector<int64_t> p(n, 0);
+    REP(i, m){
+        p[i%n]++;
     }
-    vector<int64_t> ans(n+1, 0);
-    for(auto [i, pa]:lr){
-        int64_t lo = -2, hi = -1;
-        sort(ALL(pa));
-        for(auto [ll, rr]: pa){
-            if(ll <= hi){ // kousasiteirutoki
-                hi = max(hi, rr);
-            }
-            else{
-                if(lo != -2){
-                    ans[lo] += 1;
-                    ans[hi+1] -= 1;
-                }
-                lo = ll;
-                hi = rr;
-            }
-        }
-        if(lo != -2){
-            ans[lo] += 1;
-            ans[hi+1] -= 1;
-        }
-    }
-
     REP(i, n){
-        ans[i+1] += ans[i];
-        cout << ans[i] << " ";
+        cout << p[i] << "\n";
     }
-
-
+    return 0;
 }

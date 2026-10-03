@@ -250,40 +250,45 @@ struct Fenwick {
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int64_t n, q; cin >> n >> q;
-    map<int64_t, vector<pair<int64_t, int64_t>>> lr;
-    REP(i, q){
-        int64_t l, r, x; cin >> l >> r >> x;
-        l--; r--;
-        lr[x].push_back({l, r});
-    }
-    vector<int64_t> ans(n+1, 0);
-    for(auto [i, pa]:lr){
-        int64_t lo = -2, hi = -1;
-        sort(ALL(pa));
-        for(auto [ll, rr]: pa){
-            if(ll <= hi){ // kousasiteirutoki
-                hi = max(hi, rr);
-            }
-            else{
-                if(lo != -2){
-                    ans[lo] += 1;
-                    ans[hi+1] -= 1;
-                }
-                lo = ll;
-                hi = rr;
-            }
-        }
-        if(lo != -2){
-            ans[lo] += 1;
-            ans[hi+1] -= 1;
+    int64_t n, k; cin >> n >> k;
+    vector<int64_t> a(n); REP(i, n) cin >> a[i];
+    SegTree<int64_t, OpMax<int64_t>> seg(a);
+    SegTree<int64_t, OpMin<int64_t>> seg_min(a);
+
+    int64_t p = -1, q = -1;
+    REP(i, n - 1) {
+        if (a[i] > a[i + 1]) {
+            if (p == -1) p = i;
+            q = i;
         }
     }
 
-    REP(i, n){
-        ans[i+1] += ans[i];
-        cout << ans[i] << " ";
+    if (p == -1) {
+        cout << "Yes" << "\n";
+        return 0;
     }
 
+    if (q + 1 - p + 1 > k) {
+        cout << "No" << "\n";
+        return 0;
+    }
 
+    bool ans = false;
+    int64_t lo = max<int64_t>(0, q + 2 - k);
+    int64_t hi = min<int64_t>(p, n - k);
+    for (int64_t l = lo; l <= hi; l++) {
+        int64_t r = l + k;  
+        int64_t mn = seg_min.query(l, r);
+        int64_t mx = seg.query(l, r);
+        bool ok = true;
+        if (l - 1 >= 0 && a[l - 1] > mn) ok = false;
+        if (r < n && mx > a[r]) ok = false;
+        if (ok){
+            ans = true;
+            break; 
+        }
+    }
+
+    cout << (ans ? "Yes" : "No") << "\n";
+    return 0;
 }
